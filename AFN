@@ -1,0 +1,28 @@
+// AFN
+digraph {
+	rankdir=LR
+	start -> q1
+	start [shape=point]
+	q1 [shape=circle style=bold]
+	q2 [shape=circle]
+	q3 [shape=circle]
+	q4 [shape=circle]
+	q5 [shape=circle]
+	q6 [shape=circle]
+	q7 [shape=circle]
+	q8 [shape=circle]
+	q9 [shape=circle]
+	q10 [shape=doublecircle]
+	q1 -> q8 [label=a]
+	q2 -> q3 [label=a]
+	q4 -> q5 [label=b]
+	q3 -> q7 [label="ε"]
+	q5 -> q7 [label="ε"]
+	q6 -> q2 [label="ε"]
+	q6 -> q4 [label="ε"]
+	q7 -> q6 [label="ε"]
+	q8 -> q6 [label="ε"]
+	q7 -> q9 [label="ε"]
+	q8 -> q9 [label="ε"]
+	q9 -> q10 [label=b]
+}

@@ -69,3 +69,15 @@ class Conversion(object):
             postfixExp += stack.pop()
                     
         return postfixExp
+    
+    def get_alphabet(self, expression):
+        # Obtención de alfabeto
+        alphabet = []
+        for i in expression:
+            if(i not in '().*+|$?' and i not in alphabet):
+                alphabet.append(i)
+                
+        return sorted(alphabet)
+
+# a = Conversion('a(a|b)*b')
+# print(a.infixToPostfix())
