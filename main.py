@@ -4,11 +4,31 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
-from automatas.AFN import afn
+from automatas.AFN import *
+from tools.showGraph import showGraph
 
-word = 'ab*(a|b)a*b*'
-a = afn(word)
-a.Thompson_Construction()
+# a(a|b)*b
+
+#a*
+#a**
+#(a|b)*
+#(a|b)
+# '(a*|b)*' # aaaaabbbbb
+word = 'a(a|b)*b'
+cons = Construction(word)
+nfa = cons.Thompson_Construction()
+print(nfa)
+showGraph(nfa)
+
+# self.numStates = numStates        
+# self.states = states
+# self.initialState = InState
+# self.finalState = FnState
+# self.transitions = transitions
+
+# self.inState = inState
+# self.symbol = symbol
+# self.fnState = fnState
 
 # t = True
 # while(t):
