@@ -17,8 +17,8 @@ from tools.stack import Stack
 class Conversion(object):
     def __init__(self, expression):
         self.infix = expression
-        self.precedencia = {'*': 3, '.': 2, '|': 1, '(': 0, ')': 0, '': 0}
-        self.operators = ['*', '.', '|']
+        self.precedencia = {'*': 3, '+': 3, '?': 3,'.': 2, '|': 1, '(': 0, ')': 0, '': 0}
+        self.operators = ['*', '.', '|', '+', '?']
         self.HighestPrecedence = 5
 
     def infixToPostfix(self):
@@ -34,7 +34,7 @@ class Conversion(object):
             try:
                 if (element in '|(.'):
                     continue
-                elif (((element in ')*') or (element not in '()*.|')) and (self.infix[index + 1] not in '*|)')):
+                elif (((element in ')*+?') or (element not in '?+()*.|')) and (self.infix[index + 1] not in '+*?|)')):
                     infixNew += '.'
             except:
                 pass
@@ -79,5 +79,5 @@ class Conversion(object):
                 
         return sorted(alphabet)
 
-# a = Conversion('a(a|b)*b')
+# a = Conversion('a+(a?|b)*b')
 # print(a.infixToPostfix())

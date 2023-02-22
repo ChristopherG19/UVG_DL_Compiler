@@ -14,7 +14,8 @@ from tools.showGraph import showGraph
 #(a|b)*
 #(a|b)
 # '(a*|b)*' # aaaaabbbbb
-word = 'a*bb*'
+# word = '(a|b)*a(a|b)*(a|b)'
+word = '(a|b)*ab*(a|b)*(a|b)a+a?'
 cons = Construction(word)
 nfa = cons.Thompson_Construction()
 print(nfa)
