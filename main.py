@@ -6,6 +6,7 @@
 
 from automatas.AFN import *
 from tools.showGraph import showGraph
+from tools.verification import Verification
 
 # a(a|b)*b
 
@@ -13,29 +14,55 @@ from tools.showGraph import showGraph
 #a**
 #(a|b)*
 #(a|b)
-# '(a*|b)*' # aaaaabbbbb
-# word = '(a|b)*a(a|b)*(a|b)'
-word = '(a|b)*ab*(a|b)*(a|b)a+a?'
-cons = Construction(word)
-nfa = cons.Thompson_Construction()
-print(nfa)
-showGraph(nfa)
+#(a*|b)* 
+#(a|b)*a(a|b)*(a|b)
+#(a|b)*ab*(a|b)*(a|b)a+a?
+#|a||a||
 
-# self.numStates = numStates        
-# self.states = states
-# self.initialState = InState
-# self.finalState = FnState
-# self.transitions = transitions
+t = True
+print()
+while(t):
+    word = input("Ingrese expresión: ")
+    if word == 'exit':
+        t = False
+        print()
+    else:
+        print("\nExpresión ingresada: "+word)
+        veri = Verification(word).Comprobacion()
 
-# self.inState = inState
-# self.symbol = symbol
-# self.fnState = fnState
-
-# t = True
-# while(t):
-#     word = input("Ingrese expresión: ")
-#     if word == 'exit':
-#         t = False
-#     else:
-#         a = Conversion(word)
-#         print(a.infixToPostfix())
+        errores = 0
+        for regla in veri:
+            if(not regla[0]):
+                errores += 1
+            
+        if (errores > 0):
+            print("Tienes los siguientes errores: \n")
+            for regla in veri:
+                if(not regla[0]):
+                    if (regla[3] == 'A'):
+                        print('-> ',regla[1])
+                        print("Revisar paréntesis de cierre o apertura de las siguientes posiciones: ", ",".join(str(x) for x in regla[2]))
+                        print()
+                    elif (regla[3] == 'B'):
+                        print('-> ',regla[1])
+                        if(type(regla[2]) == list):
+                            print("Revisar or's en las siguientes posiciones: ", ",".join(str(x) for x in regla[2]))
+                        else:
+                            print("Revisar or's en la expresion ingresada: ", regla[2])
+                        print()
+                    elif (regla[3] == 'C'):
+                        print('-> ',regla[1])
+                        print("Revisar expresión ingresada: ", regla[2])
+                        print()
+                    elif (regla[3] == 'D'):
+                        print('-> ',regla[1])
+                        print("Revisar expresión ingresada: ",",".join(str(x) for x in regla[2]))
+                        print()
+            SystemExit()
+        else:
+            cons = Construction(word)
+            nfa = cons.Thompson_Construction()
+            print(nfa)
+            showGraph(nfa)
+            print()
+        

@@ -25,4 +25,4 @@ def showGraph(nfa):
         origen, simbolo, destino = transicion.inState, transicion.symbol, transicion.fnState
         g.edge(str(origen), str(destino), label=str(simbolo))
         
-    g.render("AFN", view=True)
+    g.render("AFN", format='png')
