@@ -70,20 +70,13 @@ class Construction(object):
     
     def Thompson_Construction(self):
         
+        print("Infix: ", self.expression)
+        print("Postfix: ",self.postfixExp)
+        
         for i in self.postfixExp:
             self.Thompson_Components(i)
             
         self.states = self.AFNS[0].states
-
-        # Actualizar referencias en las transiciones
-        # for t in self.AFNS[0].transitions:
-        #     in_state = self.states[t.inState.stateNum-2]
-        #     fn_state = self.states[t.fnState.stateNum-2]
-        #     t.inState = in_state
-        #     t.fnState = fn_state
- 
-        #print("\nInfix: ",self.expression)
-        #print("Postfix: ",self.postfixExp)
         return self.AFNS[0]
         
     def Thompson_Components(self, char):
@@ -103,6 +96,14 @@ class Construction(object):
             afnA = self.AFNS.pop()
             afnB = self.AFNS.pop()
             self.AFNS.append(self.concat(afnB, afnA))
+
+        elif (char == '+'):
+            afn = self.AFNS.pop()
+            self.AFNS.append(self.kleenePos(afn))
+            
+        elif (char == '?'):
+            afn = self.AFNS.pop()
+            self.AFNS.append(self.questionMark(afn))
 
     def symbol(self, symbol):
         
@@ -168,73 +169,72 @@ class Construction(object):
 
         return AFN(InState, FnState, self.numStates, trans, states)
     
-    def concat(self, afnA, afnB):
-        
-        print()
-        print(afnA)
-        print()
-        print(afnB)
-        print()
-        
-        states = afnA.states + afnB.states
-        states.pop()
-        
-        InState = afnA.initialState
-        
-        FnState = states[-1]
-        self.numStates -= 1
+    def kleenePos(self, afn):
+        self.numStates += 1
+        InState = Estado(self.numStates)
+        self.numStates += 1
+        FnState = Estado(self.numStates) 
         
         trans = []
-        if (len(afnA.transitions) == 1 and len(afnB.transitions) != 1):
+        trans.append(afn.transitions)
+        trans.append(Transition(afn.finalState, self.epsilon, afn.initialState))
+        trans.append(Transition(InState, self.epsilon, afn.initialState))   
+        trans.append(Transition(afn.finalState, self.epsilon, FnState))
+           
+        trans = self.fusionTransitions(trans)
+        
+        states = afn.states
+        states.append(InState)
+        states.append(FnState)
+        
+        for state in states:
+            self.states.add(state)
 
-            trans.append(Transition(afnA.initialState, afnA.transitions[0].symbol, afnB.initialState))
-            trans.append(afnB.transitions)
+        return AFN(InState, FnState, self.numStates, trans, states)
+        
+    def questionMark(self, afn):
+        self.numStates += 1
+        InState = Estado(self.numStates)
+        self.numStates += 1
+        FnState = Estado(self.numStates)   
+        trans = []
+        trans.append(afn.transitions)
+        
+        
+        trans.append(Transition(InState, self.epsilon, afn.initialState))   
+        trans.append(Transition(afn.finalState, self.epsilon, FnState))   
+        trans.append(Transition(InState, self.epsilon, FnState))   
+        
+        trans = self.fusionTransitions(trans)
+        
+        states = afn.states
+        states.append(InState)
+        states.append(FnState)
+        
+        for state in states:
+            self.states.add(state)
+    
+        states = afn.states
+        
+        return AFN(InState, FnState, self.numStates, trans, states)
+    
+    def concat(self, afnA, afnB):
+        
+        for trans in afnB.transitions:
+            if (trans.inState == afnB.initialState):
+                trans.inState = afnA.finalState
+            elif (trans.fnState == afnB.initialState):
+                trans.fnState == afnA.finalState
 
-            trans = self.fusionTransitions(trans)
-            for t in trans:
-                if ((t.inState.stateNum-2)==-1):
-                    in_state = states[t.inState.stateNum-1]
-                    fn_state = states[t.fnState.stateNum-2]
-                    t.inState = in_state
-                    t.fnState = fn_state
-                else:
-                    in_state = states[t.inState.stateNum-2]
-                    fn_state = states[t.fnState.stateNum-2]
-                    t.inState = in_state
-                    t.fnState = fn_state
-            
-        elif (len(afnB.transitions) == 1 and len(afnA.transitions) != 1):
-            trans.append(afnA.transitions)
-            trans.append(Transition(afnA.finalState, afnB.transitions[0].symbol, afnB.initialState))
-            trans = self.fusionTransitions(trans)
-            
-        elif (len(afnB.transitions) == 1 and len(afnA.transitions) == 1):
-            trans.append(afnA.transitions)
-            trans.append(Transition(afnA.finalState, afnB.transitions[0].symbol, afnB.initialState))
-            trans = self.fusionTransitions(trans)
-            
-        else:
-            estadoTemp = afnA.transitions.pop()
-            temp = []
-            trans.append(afnA.transitions)
-            trans.append(Transition(estadoTemp.inState, estadoTemp.symbol, afnB.states[-3]))
-            temp.append(afnB.transitions)
-
-            temp = self.fusionTransitions(temp)
-            for t in temp:
-                if ((t.inState.stateNum-2)==-1):
-                    in_state = states[t.inState.stateNum-1]
-                    fn_state = states[t.fnState.stateNum-2]
-                    t.inState = in_state
-                    t.fnState = fn_state
-                else:
-                    in_state = states[t.inState.stateNum-2]
-                    fn_state = states[t.fnState.stateNum-2]
-                    t.inState = in_state
-                    t.fnState = fn_state
-                    
-            trans.append(afnB.transitions)
-            trans = self.fusionTransitions(trans)
+        afnB.states.remove(afnB.initialState)
+        states = afnA.states + afnB.states
+        InState = afnA.initialState
+        FnState = afnB.finalState            
+        
+        trans = []
+        trans.append(afnA.transitions)
+        trans.append(afnB.transitions)
+        trans = self.fusionTransitions(trans)
         
         return AFN(InState, FnState, self.numStates, trans, states)
           
