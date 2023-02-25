@@ -56,7 +56,7 @@ while(t):
                         print()
                     elif (regla[3] == 'D'):
                         print('-> ',regla[1])
-                        print("Revisar expresión ingresada: ",",".join(str(x) for x in regla[2]))
+                        print("Revisar expresión ingresada en la posición: ",",".join(str(x) for x in regla[2]))
                         print()
             SystemExit()
         else:

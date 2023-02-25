@@ -33,6 +33,10 @@ class Verification(object):
         indices = []
         
         for i in range(len(self.expression)):
+            
+            if (self.expression[-1] == '|' and self.expression[-2] != '|'):
+                return [False, 'No se puede realizar este or', [len(self.expression)], 'B']
+            
             if (i+1 < len(self.expression)):
                 if (self.expression[i] == '|' and self.expression[i+1] == '|'):
                     message = "No pueden haber dos or's seguidos"
@@ -79,7 +83,7 @@ class Verification(object):
             if (i+1 < len(self.expression)):
                 if (self.expression[i] in '+?*'):
                     posterior = self.expression[i+1]
-                    if (posterior == '(' or posterior not in '().'):
+                    if (posterior in '()' or posterior not in '().'):
                         continue
                     else:
                         message = "No se puede realizar esta operación"
