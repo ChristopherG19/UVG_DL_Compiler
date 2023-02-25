@@ -76,7 +76,7 @@ class Construction(object):
         for i in self.postfixExp:
             self.Thompson_Components(i)
             
-        self.states = self.AFNS[0].states
+        self.AFNS[0].numStates = len(self.AFNS[0].states)
         return self.AFNS[0]
         
     def Thompson_Components(self, char):

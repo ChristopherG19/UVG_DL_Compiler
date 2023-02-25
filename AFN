@@ -11,9 +11,7 @@ digraph {
 	q8 [shape=circle]
 	q9 [shape=circle]
 	q10 [shape=circle]
-	q12 [shape=circle]
-	q14 [shape=circle]
-	q16 [shape=doublecircle]
+	q12 [shape=doublecircle]
 	q1 -> q2 [label=a]
 	q3 -> q4 [label=b]
 	q4 -> q3 [label="ε"]
@@ -26,6 +24,4 @@ digraph {
 	q8 -> q9 [label="ε"]
 	q10 -> q12 [label="ε"]
 	q8 -> q12 [label="ε"]
-	q12 -> q14 [label=b]
-	q14 -> q16 [label=b]
 }
