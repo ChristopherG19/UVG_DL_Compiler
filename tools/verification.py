@@ -1,7 +1,15 @@
+# Universidad del Valle de Guatemala
+# Facultad de Ingeniería
+# Departamento de Ciencias de la Computación
+# Diseño de lenguajes
+# Christopher García 20541
+
+# Clase verification para evaluación de expresiones correctas
 class Verification(object):
     def __init__(self, expression):
         self.expression = expression
     
+    # Se retornan los resultados a diferentes pruebas
     def Comprobacion(self):
         ruleA = self.rule_parenthesis()
         ruleB = self.rule_unarios()
@@ -10,6 +18,7 @@ class Verification(object):
 
         return ruleA, ruleB, ruleC, ruleD
         
+    # Regla respecto a los paréntesis
     def rule_parenthesis(self):
         stack = []
         missing_parentheses = []
@@ -27,7 +36,8 @@ class Verification(object):
         else:
             message = 'Falta uno o más paréntesis'
             return [False, message, missing_parentheses, 'A']
-        
+     
+    # Regla respecto a los operadores unarios   
     def rule_unarios(self):
         message = ""
         indices = []
@@ -54,14 +64,16 @@ class Verification(object):
             return [True, 'Todo correcto', [], 'B']
         else:
             return [False, message, indices, 'B']
-        
+    
+    # Regla respecto al alfabeto    
     def rule_symbols(self):
         symbols = set("?*()+|")
         if all(c in symbols for c in self.expression):
             return [False, 'No hay símbolos del alfabeto', self.expression, 'C']
         else:
             return [True, 'Todo correcto', [], 'C']
-        
+    
+    # Regla respecto a las cerraduras  
     def rule_kleenes(self):
         message = ""
         indices = []
@@ -95,3 +107,4 @@ class Verification(object):
             return [True, 'Todo correcto', [], 'D']
         else:
             return [False, message, indices, 'D']
+        

@@ -6,7 +6,8 @@
 
 import graphviz
 
-def showGraph(nfa):
+# Función para mostrar AFN's
+def showGraphNFA(nfa):
     g = graphviz.Digraph(comment="AFN")
 
     g.attr(rankdir='LR')
@@ -26,3 +27,25 @@ def showGraph(nfa):
         g.edge(str(origen), str(destino), label=str(simbolo))
         
     g.render("AFN", format='png')
+
+# Función para mostrar AFD's
+def showGraphDFA(dfa):
+    g = graphviz.Digraph(comment="AFD")
+
+    g.attr(rankdir='LR')
+
+    for estado in dfa.states:
+        if estado == dfa.initialState:
+            g.edge('start', str(estado))
+            g.node('start', shape='point')
+            g.node(str(estado), shape='circle', style='bold')
+        elif estado in dfa.finalState:
+            g.node(str(estado), shape='doublecircle')
+        else:
+            g.node(str(estado), shape='circle')
+
+    for transicion in dfa.transitions:
+        origen, simbolo, destino = transicion.inState, transicion.symbol, transicion.fnState
+        g.edge(str(origen), str(destino), label=str(simbolo))
+        
+    g.render("AFD", format='png')

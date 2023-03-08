@@ -1,0 +1,11 @@
+// AFD
+digraph {
+	rankdir=LR
+	start -> A
+	start [shape=point]
+	A [shape=circle style=bold]
+	B [shape=doublecircle]
+	C [shape=doublecircle]
+	A -> B [label=a]
+	A -> C [label=b]
+}

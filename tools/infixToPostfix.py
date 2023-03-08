@@ -78,6 +78,3 @@ class Conversion(object):
                 alphabet.append(i)
                 
         return sorted(alphabet)
-
-# a = Conversion('a+(a?|b)*b')
-# print(a.infixToPostfix())

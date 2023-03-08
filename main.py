@@ -5,7 +5,8 @@
 # Christopher García 20541
 
 from automatas.AFN import *
-from tools.showGraph import showGraph
+from automatas.subconjuntos import *
+from tools.showGraph import *
 from tools.verification import Verification
 
 # a(a|b)*b
@@ -28,8 +29,9 @@ while(t):
         print()
     else:
         print("\nExpresión ingresada: "+word)
+        
+        # Se realiza la evaluación de la expresión
         veri = Verification(word).Comprobacion()
-
         errores = 0
         for regla in veri:
             if(not regla[0]):
@@ -60,9 +62,30 @@ while(t):
                         print()
             SystemExit()
         else:
-            cons = Construction(word)
-            nfa = cons.Thompson_Construction()
-            print(nfa)
-            showGraph(nfa)
+            
+            #Se obtiene la expresión en postfix y el alfabeto
+            Obj = Conversion(word)
+            postfixExp = Obj.infixToPostfix()
+            alphabet = Obj.get_alphabet(word)
+            print("Infix: ", word)
+            print("Postfix: ", postfixExp)
+            print("Alfabeto: ", alphabet)
             print()
-        
+            
+            # Inicio de creación de autómatas
+            print("-----  AFN  -----")
+            nfaCons = Construction(word, postfixExp, alphabet)
+            nfa = nfaCons.Thompson_Construction()
+            print(nfa)
+            print()
+            
+            print("-----  AFD (Subconjuntos)  -----")
+            dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
+            dfa = dfaSub.subconjuntos_construction()
+            print(dfa)
+            print()
+            
+            # Se crean las imágenes de los autómatas
+            showGraphNFA(nfa)
+            showGraphDFA(dfa)
+            
