@@ -9,6 +9,7 @@ from automatas.subconjuntos import *
 from tools.showGraph import *
 from tools.verification import Verification
 from simulation.nfaSimulation import *
+from simulation.dfaSimulation import *
 
 # a(a|b)*b
 
@@ -100,12 +101,18 @@ print("Alfabeto: ", alphabet)
 print()
 
 # Inicio de creación de autómatas
+w = 'aabb'
 print("-----  AFN  -----")
 nfaCons = Construction(word, postfixExp, alphabet)
 nfa = nfaCons.Thompson_Construction()
 print(nfa)
 print()
-w = 'aaaaaabbb'
 nfaS = nfaSimulation(nfa, w)
 print(f"Cadena ingresada: {w} | Resultado: {nfaS.Simulation()} es aceptada")
 print()
+print("-----  AFD  -----")
+dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
+dfa = dfaSub.subconjuntos_construction()
+print(dfa)
+dfaS = dfaSimulation(dfa, w)
+print(f"Cadena ingresada: {w} | Resultado: {dfaS.Simulation()} es aceptada\n")
