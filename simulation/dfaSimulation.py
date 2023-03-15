@@ -36,7 +36,10 @@ class dfaSimulation():
             if (ActualState is None):
                 return False
 
-        if (ActualState[0] in self.AFD.finalStates):
-            return "Si"
-        else:
-            return "No" 
+        for element in ActualState:
+            if (element in self.AFD.finalStates):
+                return "Si"
+            else:
+                return "No" 
+            
+        return "No"

@@ -10,6 +10,7 @@ from tools.showGraph import *
 from tools.verification import Verification
 from simulation.nfaSimulation import *
 from simulation.dfaSimulation import *
+from automatas.construccionDirecta import *
 
 # a(a|b)*b
 
@@ -87,11 +88,12 @@ from simulation.dfaSimulation import *
 #             print()
             
 #             # Se crean las imágenes de los autómatas
-#             showGraphNFA(nfa)
-#             showGraphDFA(dfa)
+#             showGraphNFA(nfa, "Thompson")
+#             showGraphDFA(dfa, "Subconjuntos")
             
 #Se obtiene la expresión en postfix y el alfabeto
-word = '(aa|bb)*'
+word = '(a*|b*)c'
+# word = '(b|b)*abb(a|b)*'
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
 alphabet = Obj.get_alphabet(word)
@@ -100,19 +102,35 @@ print("Postfix: ", postfixExp)
 print("Alfabeto: ", alphabet)
 print()
 
-# Inicio de creación de autómatas
-w = 'aabb'
-print("-----  AFN  -----")
+print("-----  AFN (Thompson) -----")
 nfaCons = Construction(word, postfixExp, alphabet)
 nfa = nfaCons.Thompson_Construction()
 print(nfa)
 print()
-nfaS = nfaSimulation(nfa, w)
-print(f"Cadena ingresada: {w} | Resultado: {nfaS.Simulation()} es aceptada")
-print()
-print("-----  AFD  -----")
+print("-----  AFD (Subconjuntos) -----")
 dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
-dfa = dfaSub.subconjuntos_construction()
-print(dfa)
-dfaS = dfaSimulation(dfa, w)
-print(f"Cadena ingresada: {w} | Resultado: {dfaS.Simulation()} es aceptada\n")
+dfaS = dfaSub.subconjuntos_construction()
+print(dfaS)
+print()
+print("-----  AFD (Directo)  -----")
+T = directConstruction(word, postfixExp, alphabet)
+dfaD = T.buildDFA()
+print(dfaD)
+print()
+
+prueba = 'c'
+
+nfaS = nfaSimulation(nfa, prueba)
+print(f"(Thompson) Cadena ingresada: {prueba} | Resultado: {nfaS.Simulation()} es aceptada")
+
+dfaSim = dfaSimulation(dfaS, prueba)
+print(f"(Subconjuntos) Cadena ingresada: {prueba} | Resultado: {dfaSim.Simulation()} es aceptada")
+
+dfaDir = dfaSimulation(dfaD, prueba)
+print(f"(Directo) Cadena ingresada: {prueba} | Resultado: {dfaDir.Simulation()} es aceptada")
+
+print()
+
+showGraphNFA(nfa, "Thompson")
+showGraphDFA(dfaS, "Subconjuntos")
+showGraphDFA(dfaD, "Directo")
