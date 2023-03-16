@@ -26,7 +26,7 @@ def showGraphNFA(nfa, metodo):
         origen, simbolo, destino = transicion.inState, transicion.symbol, transicion.fnState
         g.edge(str(origen), str(destino), label=str(simbolo))
         
-    g.render(f"AFN_{metodo}", format='png')
+    g.render(f'results/AFN_{metodo}',format='png')
 
 # Función para mostrar AFD's
 def showGraphDFA(dfa, metodo):
@@ -48,4 +48,4 @@ def showGraphDFA(dfa, metodo):
         origen, simbolo, destino = transicion.inState, transicion.symbol, transicion.fnState
         g.edge(str(origen), str(destino), label=str(simbolo))
         
-    g.render(f"AFD_{metodo}", format='png')
+    g.render(f'results/AFD_{metodo}', format='png')

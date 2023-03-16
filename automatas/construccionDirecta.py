@@ -4,8 +4,9 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
-from automatas.AFD import AFD, Transition
+from automatas.AFD import *
 from tools.tree import *
+from tools.components import *
 
 class directConstruction():
     def __init__(self, infix, postfix, alphabet):

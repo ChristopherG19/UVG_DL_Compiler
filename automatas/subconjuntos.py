@@ -6,6 +6,7 @@
 
 # Se importa la clase AFD
 from automatas.AFD import *
+from tools.components import *
 
 # Clase principal donde se realiza el algoritmo de subconjuntos
 class subconjuntos():

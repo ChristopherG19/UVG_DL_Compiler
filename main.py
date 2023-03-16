@@ -11,6 +11,7 @@ from tools.verification import Verification
 from simulation.nfaSimulation import *
 from simulation.dfaSimulation import *
 from automatas.construccionDirecta import *
+from automatas.minimizacion import *
 
 # a(a|b)*b
 
@@ -92,8 +93,11 @@ from automatas.construccionDirecta import *
 #             showGraphDFA(dfa, "Subconjuntos")
             
 #Se obtiene la expresión en postfix y el alfabeto
-word = '(a*|b*)c'
-# word = '(b|b)*abb(a|b)*'
+# word = '(a*|b*)c'
+# word = '(aa|b*b)'
+# # word = '(b|b)*abb(a|b)*'
+word = 'ab*|aba'
+
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
 alphabet = Obj.get_alphabet(word)
@@ -133,4 +137,30 @@ print()
 
 showGraphNFA(nfa, "Thompson")
 showGraphDFA(dfaS, "Subconjuntos")
-showGraphDFA(dfaD, "Directo")
+# showGraphDFA(dfaD, "Directo")
+
+# word = 'ab*|aba'
+# Obj = Conversion(word)
+# postfixExp = Obj.infixToPostfix()
+# alphabet = Obj.get_alphabet(word)
+# print("Infix: ", word)
+# print("Postfix: ", postfixExp)
+# print("Alfabeto: ", alphabet)
+# print()
+
+# print("-----  AFN (Thompson) -----")
+# nfaCons = Construction(word, postfixExp, alphabet)
+# nfa = nfaCons.Thompson_Construction()
+# print(nfa)
+# print()
+# print("-----  AFD (Subconjuntos) -----")
+# dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
+# dfaS = dfaSub.subconjuntos_construction()
+# print(dfaS)
+# print()
+
+# showGraphNFA(nfa, "Thompson")
+# showGraphDFA(dfaS, "Subconjuntos")
+
+# mini = Minimizador(dfaS, alphabet)
+# print(mini.minimize_afd())
