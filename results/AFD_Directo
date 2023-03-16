@@ -6,9 +6,8 @@ digraph {
 	A [shape=circle style=bold]
 	B [shape=circle]
 	C [shape=doublecircle]
-	D [shape=doublecircle]
 	A -> B [label=a]
-	A -> C [label=b]
-	B -> D [label=a]
+	B -> C [label=a]
+	B -> B [label=b]
 	C -> C [label=b]
 }

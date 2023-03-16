@@ -18,9 +18,12 @@ class node():
         
     def calculate_positions(self):
         if self.symbol not in ".|*+?":
-            self.firstpos.add(self)
-            self.lastpos.add(self)
-            self.nullable = False
+            if self.symbol == 'ε':
+                self.nullable = True
+            else:
+                self.firstpos.add(self)
+                self.lastpos.add(self)
+                self.nullable = False
         else:
             if self.symbol in "*+?":
                 self.leftChild.calculate_positions()
@@ -51,7 +54,12 @@ class node():
                     self.firstpos.update(self.rightChild.firstpos)
                 else: 
                     self.firstpos.update(self.leftChild.firstpos)
-                self.lastpos.update(self.rightChild.lastpos)
+                    
+                if self.rightChild.nullable:
+                    self.lastpos.update(self.leftChild.lastpos)
+                    self.lastpos.update(self.rightChild.lastpos)
+                else:
+                    self.lastpos.update(self.rightChild.lastpos)
                 
         self.calculate_followpos()
 
@@ -61,8 +69,11 @@ class node():
                 position.followpos.update(self.rightChild.firstpos)
                 
         elif self.symbol == "*":
-            for position in self.lastpos:
-                position.followpos.update(self.firstpos)
+            for position in self.leftChild.lastpos:
+                position.followpos.update(self.leftChild.firstpos)
+                
+        elif self.symbol == "ε":
+            pass
     
     def traverse_tree(self, node):
         firstP = [n.number for n in node.firstpos]

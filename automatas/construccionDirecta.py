@@ -49,6 +49,8 @@ class directConstruction():
                 Dstates_marked.append(t)
                 
                 for symbol in self.alphabet:
+                    if(symbol == 'ε'):
+                        continue
                     U = []
 
                     # Buscamos en todo el árbol por las posiciones que tengan el símbolo
@@ -93,6 +95,7 @@ class directConstruction():
             
             if numberFState in values:
                 FnStates.append(key)
+                
         print(names)
         return AFD(InState, FnStates, len(names), final_Trans, list(names.keys()))
 

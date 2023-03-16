@@ -53,11 +53,13 @@ class subconjuntos():
                 Dstates_marked.append(t)
 
                 for symbol in self.alphabet:
+                    if(symbol == 'ε'):
+                        continue
                     U = self.e_closure(self.move(t, symbol))
                     
                     if(U not in Dstates):
                         Dstates.append(U)
-                        
+
                     if(t != []):
                         if(U != []):
                             self.tempTransitions.append(Transition(t, symbol, U))                     
@@ -67,7 +69,7 @@ class subconjuntos():
             if(newState != []):
                 name = ABC.pop()
                 self.names[name] = newState
-                
+
         # Se renombran las transiciones
         for trans in self.tempTransitions:
             newInState = None

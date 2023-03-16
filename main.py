@@ -93,10 +93,31 @@ from automatas.minimizacion import *
 #             showGraphDFA(dfa, "Subconjuntos")
             
 #Se obtiene la expresión en postfix y el alfabeto
+
+''' Expresiones pruebas '''
 # word = '(a*|b*)c'
-# word = '(aa|b*b)'
-# # word = '(b|b)*abb(a|b)*'
-word = 'ab*|aba'
+# word = '(b|b)*abb(a|b)*'
+# word = '(a|ε)b(a+)c?'
+# word = '(a|b)*a(a|b)(a|b)'
+# word = 'b*ab?'
+# word = 'b+abc+'
+# word = 'ab*ab*'
+# word = '0(0|1)*0'
+# word = '((ε|0)1*)*'
+# word = '(0|1)*0(0|1)(0|1)'
+# word = '(00)*(11)*'
+# word = '(0|1)1*(0|1)'
+# word = '0?(1|ε)?0*'
+# word = '((1?)*)*'
+# word = '(01)*(10)*'
+
+''' Expresiones prelaboratorio '''
+# word = 'ab*ab*'
+word = '0?(1?)?0*'
+# word = '(a*|b*)c'
+# word = '(b|b)*abb(a|b)*'
+# word = '(a|ε)b(a+)c?'
+# word = '(a|b)*a(a|b)(a|b)'
 
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
@@ -122,7 +143,7 @@ dfaD = T.buildDFA()
 print(dfaD)
 print()
 
-prueba = 'c'
+prueba = 'aa'
 
 nfaS = nfaSimulation(nfa, prueba)
 print(f"(Thompson) Cadena ingresada: {prueba} | Resultado: {nfaS.Simulation()} es aceptada")
@@ -137,7 +158,7 @@ print()
 
 showGraphNFA(nfa, "Thompson")
 showGraphDFA(dfaS, "Subconjuntos")
-# showGraphDFA(dfaD, "Directo")
+showGraphDFA(dfaD, "Directo")
 
 # word = 'ab*|aba'
 # Obj = Conversion(word)
