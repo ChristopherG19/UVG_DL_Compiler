@@ -13,10 +13,12 @@ def showGraphNFA(nfa, metodo):
     g.attr(rankdir='LR')
 
     for estado in nfa.states:
+        if estado == nfa.initialState and estado == nfa.finalState:
+            g.edge('start', str(estado))
+            
         if estado == nfa.initialState:
             g.edge('start', str(estado))
             g.node('start', shape='point')
-            g.node(str(estado), shape='circle', style='bold')
         elif estado == nfa.finalState:
             g.node(str(estado), shape='doublecircle')
         else:
@@ -35,10 +37,12 @@ def showGraphDFA(dfa, metodo):
     g.attr(rankdir='LR')
 
     for estado in dfa.states:
+        if estado == dfa.initialState and estado in dfa.finalStates:
+            g.node(str(estado), shape='doublecircle')
+            
         if estado == dfa.initialState:
             g.edge('start', str(estado))
             g.node('start', shape='point')
-            g.node(str(estado), shape='circle', style='bold')
         elif estado in dfa.finalStates:
             g.node(str(estado), shape='doublecircle')
         else:

@@ -68,7 +68,7 @@ class node():
             for position in self.leftChild.lastpos:
                 position.followpos.update(self.rightChild.firstpos)
                 
-        elif self.symbol == "*":
+        elif self.symbol in "*+":
             for position in self.leftChild.lastpos:
                 position.followpos.update(self.leftChild.firstpos)
                 

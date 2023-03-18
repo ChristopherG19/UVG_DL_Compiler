@@ -95,72 +95,30 @@ from automatas.minimizacion import *
 #Se obtiene la expresión en postfix y el alfabeto
 
 ''' Expresiones pruebas '''
-# word = '(a*|b*)c'
-# word = '(b|b)*abb(a|b)*'
-# word = '(a|ε)b(a+)c?'
-# word = '(a|b)*a(a|b)(a|b)'
-# word = 'b*ab?'
-# word = 'b+abc+'
-# word = 'ab*ab*'
-# word = '0(0|1)*0'
-# word = '((ε|0)1*)*'
-# word = '(0|1)*0(0|1)(0|1)'
-# word = '(00)*(11)*'
-# word = '(0|1)1*(0|1)'
-# word = '0?(1|ε)?0*'
-# word = '((1?)*)*'
-# word = '(01)*(10)*'
+# word = '(a*|b*)c' #Si
+# word = '(b|b)*abb(a|b)*' #Si
+# word = '(a|ε)b(a?)c?' #REVISAR
+# word = '(a|b)*a(a|b)(a|b)' #Si
+# word = 'b*ab?' #Si
+# word = 'b+abc+' #Si
+# word = 'ab*ab*' #Si
+# word = '0(0|1)*0' #Si
+# word = '((ε|0)1*)*' #REVISAR
+# word = '(0|1)*0(0|1)(0|1)' #Si
+# word = '(00)*(11)*' #Si
+# word = '(0|1)1*(0|1)' #Si
+# word = '0?(1|ε)?0*' #Si
+# word = '((1?)*)*' #Si
+# word = '(01)*(10)*' #Si
 
 ''' Expresiones prelaboratorio '''
-# word = 'ab*ab*'
-word = '0?(1?)?0*'
-# word = '(a*|b*)c'
-# word = '(b|b)*abb(a|b)*'
-# word = '(a|ε)b(a+)c?'
-# word = '(a|b)*a(a|b)(a|b)'
+# word = 'ab*ab*' #Si
+# word = '0?(1?)?0*' #Si
+# word = '(a*|b*)c' #Si
+# word = '(b|b)*abb(a|b)*' #Si
+# word = '(a|ε)b(a+)c?' #REVISAR
+# word = '(a|b)*a(a|b)(a|b)' #Si
 
-Obj = Conversion(word)
-postfixExp = Obj.infixToPostfix()
-alphabet = Obj.get_alphabet(word)
-print("Infix: ", word)
-print("Postfix: ", postfixExp)
-print("Alfabeto: ", alphabet)
-print()
-
-print("-----  AFN (Thompson) -----")
-nfaCons = Construction(word, postfixExp, alphabet)
-nfa = nfaCons.Thompson_Construction()
-print(nfa)
-print()
-print("-----  AFD (Subconjuntos) -----")
-dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
-dfaS = dfaSub.subconjuntos_construction()
-print(dfaS)
-print()
-print("-----  AFD (Directo)  -----")
-T = directConstruction(word, postfixExp, alphabet)
-dfaD = T.buildDFA()
-print(dfaD)
-print()
-
-prueba = 'aa'
-
-nfaS = nfaSimulation(nfa, prueba)
-print(f"(Thompson) Cadena ingresada: {prueba} | Resultado: {nfaS.Simulation()} es aceptada")
-
-dfaSim = dfaSimulation(dfaS, prueba)
-print(f"(Subconjuntos) Cadena ingresada: {prueba} | Resultado: {dfaSim.Simulation()} es aceptada")
-
-dfaDir = dfaSimulation(dfaD, prueba)
-print(f"(Directo) Cadena ingresada: {prueba} | Resultado: {dfaDir.Simulation()} es aceptada")
-
-print()
-
-showGraphNFA(nfa, "Thompson")
-showGraphDFA(dfaS, "Subconjuntos")
-showGraphDFA(dfaD, "Directo")
-
-# word = 'ab*|aba'
 # Obj = Conversion(word)
 # postfixExp = Obj.infixToPostfix()
 # alphabet = Obj.get_alphabet(word)
@@ -179,9 +137,53 @@ showGraphDFA(dfaD, "Directo")
 # dfaS = dfaSub.subconjuntos_construction()
 # print(dfaS)
 # print()
+# print("-----  AFD (Directo)  -----")
+# T = directConstruction(word, postfixExp, alphabet)
+# dfaD = T.buildDFA()
+# print(dfaD)
+# print()
+
+# prueba = 'aa'
+
+# nfaS = nfaSimulation(nfa, prueba)
+# print(f"(Thompson) Cadena ingresada: {prueba} | Resultado: {nfaS.Simulation()} es aceptada")
+
+# dfaSim = dfaSimulation(dfaS, prueba)
+# print(f"(Subconjuntos) Cadena ingresada: {prueba} | Resultado: {dfaSim.Simulation()} es aceptada")
+
+# dfaDir = dfaSimulation(dfaD, prueba)
+# print(f"(Directo) Cadena ingresada: {prueba} | Resultado: {dfaDir.Simulation()} es aceptada")
+
+# print()
 
 # showGraphNFA(nfa, "Thompson")
 # showGraphDFA(dfaS, "Subconjuntos")
+# showGraphDFA(dfaD, "Directo")
 
-# mini = Minimizador(dfaS, alphabet)
-# print(mini.minimize_afd())
+# word = 'a(a|b|c)bc' #Prueba
+# word = 'ba|b(a*)'
+word = '0?(1?)?0*'
+Obj = Conversion(word)
+postfixExp = Obj.infixToPostfix()
+alphabet = Obj.get_alphabet(word)
+print("Infix: ", word)
+print("Postfix: ", postfixExp)
+print("Alfabeto: ", alphabet)
+print()
+
+print("-----  AFN (Thompson) -----")
+nfaCons = Construction(word, postfixExp, alphabet)
+nfa = nfaCons.Thompson_Construction()
+print(nfa)
+print()
+print("-----  AFD (Subconjuntos) -----")
+dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
+dfaS = dfaSub.subconjuntos_construction()
+print(dfaS)
+print()
+
+showGraphNFA(nfa, "Thompson")
+showGraphDFA(dfaS, "Subconjuntos")
+
+mini = Minimizador(dfaS, alphabet)
+print(mini.minimize_afd())

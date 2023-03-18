@@ -21,7 +21,7 @@ class Tree():
                 stackNodes.append(newNode)
                 numPos += 1
             else:
-                if (symbol == '*' or symbol == '+' or symbol == '?'):
+                if (symbol in '*?+'):
                     leftNewNode = stackNodes.pop()
                     newNode = node(symbol, leftNewNode)
                     stackNodes.append(newNode)
