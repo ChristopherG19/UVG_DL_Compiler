@@ -95,35 +95,32 @@ from automatas.minimizacion import *
 #Se obtiene la expresión en postfix y el alfabeto
 
 ''' Expresiones pruebas '''
-# word = '(a*|b*)c' #Si
-# word = '(b|b)*abb(a|b)*' #Si
-# word = '(a|ε)b(a?)c?' #Si
-# word = '(a|b)*a(a|b)(a|b)' #Si
-# word = 'b*ab?' #Si
-# word = 'b+abc+' #Si
-# word = 'ab*ab*' #Si
-# word = '0(0|1)*0' #Si #Revisar directo min
-# word = '((ε|0)1*)*' #Si
-# word = '(0|1)*0(0|1)(0|1)' #Si
-# word = '(00)*(11)*' #Si
-# word = '(0|1)1*(0|1)' #Si
-# word = '0?(1|ε)?0*' #Si
-# word = '((1?)*)*' #Si
-# word = '(01)*(10)*' #Si
+# word = '(a*|b*)c' 
+# word = '(b|b)*abb(a|b)*' 
+# word = '(a|ε)b(a?)c?' 
+# word = '(a|b)*a(a|b)(a|b)' 
+# word = 'b*ab?' 
+# word = 'b+abc+' 
+# word = 'ab*ab*' 
+# word = '0(0|1)*0' 
+# word = '((ε|0)1*)*' 
+# word = '(0|1)*0(0|1)(0|1)' 
+# word = '(0*0)*(1*1)*' 
+# word = '(0|1)1*(0|1)' 
+# word = '0?(1|ε)?0*' 
+# word = '((1?)*)*' 
+# word = '(01)*(10)*' 
 
 ''' Expresiones prelaboratorio '''
-word = 'ab*ab*' #Si
-# word = '0?(1?)?0*' #Si
-# word = '(a*|b*)c' #Si
-# word = '(b|b)*abb(a|b)*' #Si
-# word = '(a|ε)b(a+)c?' #Si
-# word = '(a|b)*a(a|b)(a|b)' #Si
+# word = 'ab*ab*' 
+# word = '0?(1?)?0*' 
+# word = '(a*|b*)c' 
+# word = '(b|b)*abb(a|b)*' 
+# word = '(a|ε)b(a+)c?' 
+# word = '(a|b)*a(a|b)(a|b)' 
 
-''' Expresiones extra de prueba '''
-# word = 'a(a|b|c)bc' #Funciona por completo #cadena = 'aabc'
-# word = 'ba|b(a*)' #Funciona por completo #cadena = 'baaaa'
-# word = '0?(1?)?0*' #Funciona por completo #cadena = ''
-# word = '0(0|1)*0' #Funciona por completo #cadena = '00'
+word = 'a(a|b|c)bc'
+cadena = 'aabc'
 
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
@@ -173,8 +170,6 @@ print()
 
 showGraphDFA(dfaMinD, "Minimizado_Directo")
 
-cadena = 'aabc'
-
 nfaS = nfaSimulation(nfa, cadena)
 print(f"(Thompson) Cadena ingresada: {cadena} | Resultado: {nfaS.Simulation()} es aceptada")
 
@@ -185,9 +180,9 @@ dfaDSim = dfaSimulation(dfaD, cadena)
 print(f"(Directo) Cadena ingresada: {cadena} | Resultado: {dfaDSim.Simulation()} es aceptada")
 
 minDfaSSim = dfaSimulation(dfaMinS, cadena)
-print(f"(Subconjuntos minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaSSim.Simulation()} es aceptada")
+print(f"(SC minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaSSim.Simulation()} es aceptada")
 
 minDfaDSim = dfaSimulation(dfaMinD, cadena)
-print(f"(Directo minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaDSim.Simulation()} es aceptada")
+print(f"(D minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaDSim.Simulation()} es aceptada")
 
 print()

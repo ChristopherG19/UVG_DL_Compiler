@@ -3,11 +3,14 @@ digraph {
 	rankdir=LR
 	start -> A
 	start [shape=point]
-	B [shape=doublecircle]
+	B [shape=circle]
 	C [shape=circle]
-	A -> C [label=0]
-	C -> B [label=0]
-	C -> C [label=1]
-	B -> B [label=0]
-	B -> C [label=1]
+	D [shape=doublecircle]
+	E [shape=circle]
+	A -> B [label=a]
+	B -> E [label=a]
+	B -> E [label=b]
+	B -> E [label=c]
+	E -> C [label=b]
+	C -> D [label=c]
 }

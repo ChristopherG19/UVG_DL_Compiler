@@ -4,9 +4,13 @@ digraph {
 	start -> A
 	start [shape=point]
 	B [shape=circle]
-	C [shape=doublecircle]
+	C [shape=circle]
+	D [shape=circle]
+	E [shape=doublecircle]
 	A -> B [label=a]
 	B -> C [label=a]
-	B -> B [label=b]
-	C -> C [label=b]
+	B -> C [label=b]
+	B -> C [label=c]
+	C -> D [label=b]
+	D -> E [label=c]
 }

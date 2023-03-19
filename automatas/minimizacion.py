@@ -90,7 +90,8 @@ class Minimizador():
                             if key not in subgroups:
                                 subgroups[key] = [(subgroup[1], subgroup[2])]
                             else:
-                                subgroups[key].append((subgroup[1], subgroup[2]))
+                                if ((subgroup[1], subgroup[2]) not in subgroups[key]):
+                                    subgroups[key].append((subgroup[1], subgroup[2]))
 
                     # Lista de estados con valores únicos
                     estados_unicos = []
@@ -170,7 +171,8 @@ class Minimizador():
                                 not_same_group += subgroups[key]
 
                     if len(not_same_group) != 0:
-                        result.append(not_same_group)
+                        if (not_same_group not in result):
+                            result.append(not_same_group)
                         for key, value in subgroups.items():
                             if value not in result:
                                 result.append(value)
@@ -185,7 +187,8 @@ class Minimizador():
                                 if key not in subgroups:
                                     subgroups[key] = [(subgroup[1], subgroup[2])]
                                 else:
-                                    subgroups[key].append((subgroup[1], subgroup[2]))
+                                    if ((subgroup[1], subgroup[2]) not in subgroups[key]):
+                                        subgroups[key].append((subgroup[1], subgroup[2]))
                         # Lista de estados con valores únicos
                         estados_unicos = []
 
@@ -207,13 +210,16 @@ class Minimizador():
                             # de lo contrario, los agregamos como un estado único
                             if len(grupo) >= 1 and grupo not in estados_unicos:
                                 estados_unicos.append(grupo)
-                                        
-                        result.extend(estados_unicos)
-                                
+                                  
+                        compr = all(sublista in result for sublista in estados_unicos)
+
+                        if estados_unicos not in result and not compr:
+                            result.extend(estados_unicos)
+                             
                         result = sorted(result, key=lambda x: x[0])
                     else:
-                        if (list(set(Gi)-set(not_same_group)) not in result):
-                            result.append(list(set(Gi)-set(not_same_group)))
+                        if (sorted(list(set(Gi)-set(not_same_group))) not in result):
+                            result.append(sorted(list(set(Gi)-set(not_same_group))))
 
                 if (G == result):
                     break
