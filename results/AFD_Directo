@@ -1,9 +1,12 @@
 // AFD
 digraph {
 	rankdir=LR
-	A [shape=doublecircle]
 	start -> A
 	start [shape=point]
-	B [shape=doublecircle]
+	B [shape=circle]
+	C [shape=doublecircle]
 	A -> B [label=a]
+	B -> C [label=a]
+	B -> B [label=b]
+	C -> C [label=b]
 }

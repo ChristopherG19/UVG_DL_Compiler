@@ -22,21 +22,12 @@ class subconjuntos():
         self.FnStates = []
         self.expression = expression
         self.postfixExp = postfix
-         
-    # Se crea un alfabeto para nombrar estados posteriormente           
-    def listAlphabet(self):
-        a = list(map(chr, range(97, 123)))
-        new = []
-        for i in a:
-            new.append(i.upper())
-        new.reverse()
-        return new
         
     # Algoritmo principal de subconjuntos
     def subconjuntos_construction(self): 
         
         # Se crean nombres para estados   
-        ABC = self.listAlphabet()   
+        ABC = listAlphabet()   
         self.names = {}
          
         # Se sigue el pseudocódigo proporcionado por el libro del dragón

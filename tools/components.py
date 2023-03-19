@@ -27,3 +27,18 @@ class Transition():
     
     def __repr__(self):
         return str(self)
+    
+    def __eq__(self, other):
+        if isinstance(other, Transition):
+            return self.inState == other.inState and self.symbol == other.symbol and self.fnState == other.fnState
+        return False
+    
+# Se crea un alfabeto para nombrar estados posteriormente           
+def listAlphabet():
+    a = list(map(chr, range(97, 123)))
+    new = []
+    for i in a:
+        new.append(i.upper())
+    new.reverse()
+    return new
+    

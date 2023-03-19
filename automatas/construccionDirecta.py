@@ -29,7 +29,7 @@ class directConstruction():
         trans = []
         numberFState = 1
         names = {}
-        ABC = self.listAlphabet()
+        ABC = listAlphabet()
         
         for i in FinalTree:
             for j in i:
@@ -38,6 +38,9 @@ class directConstruction():
             
             if (i[0] == '#'):
                 numberFState = i[4]
+                
+            #Imprimir árbol
+            # print(i)
 
         # Se sigue el pseudocódigo proporcionado por el libro del dragón
         Dstates = []
@@ -99,14 +102,6 @@ class directConstruction():
         print(names)
         return AFD(InState, FnStates, len(names), final_Trans, list(names.keys()))
 
-    # Se crea un alfabeto para nombrar estados posteriormente           
-    def listAlphabet(self):
-        a = list(map(chr, range(97, 123)))
-        new = []
-        for i in a:
-            new.append(i.upper())
-        new.reverse()
-        return new
         
 
         
