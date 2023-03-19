@@ -152,7 +152,7 @@ class Minimizador():
 
                         if next_states not in G_temp:
                             G_temp.append(next_states)
-                            
+                                  
                     subgroups = {}
                     for group in G_temp:
                         for subgroup in group:
@@ -166,13 +166,51 @@ class Minimizador():
                     not_same_group = []
                     for key in subgroups.keys():
                         if key[0] not in Gi:
-                            not_same_group += subgroups[key]
-                    
+                            if([key[0]] not in result):
+                                not_same_group += subgroups[key]
+
                     if len(not_same_group) != 0:
                         result.append(not_same_group)
                         for key, value in subgroups.items():
                             if value not in result:
                                 result.append(value)
+                            
+                    elif len(not_same_group) == 0:
+                        subgroups = {}
+
+                        for group in G_temp:
+                            for subgroup in group:
+                                # Se obtienen los subgrupos
+                                key = subgroup[0]
+                                if key not in subgroups:
+                                    subgroups[key] = [(subgroup[1], subgroup[2])]
+                                else:
+                                    subgroups[key].append((subgroup[1], subgroup[2]))
+                        # Lista de estados con valores únicos
+                        estados_unicos = []
+
+                        # Recorremos cada estado
+                        for estado in subgroups:
+                            # Valor del estado actual
+                            valor_actual = subgroups[estado]
+                            
+                            # Creamos una lista para agrupar los estados con valores idénticos
+                            grupo = [estado]
+                            
+                            # Recorremos los demás estados para comparar su valor con el valor actual
+                            for otro_estado in subgroups:
+                                if estado != otro_estado and subgroups[otro_estado] == valor_actual:
+                                    grupo.append(otro_estado)
+                            
+                            grupo.sort()
+                            # Si encontramos estados con el mismo valor, los agregamos al grupo
+                            # de lo contrario, los agregamos como un estado único
+                            if len(grupo) >= 1 and grupo not in estados_unicos:
+                                estados_unicos.append(grupo)
+                                        
+                        result.extend(estados_unicos)
+                                
+                        result = sorted(result, key=lambda x: x[0])
                     else:
                         if (list(set(Gi)-set(not_same_group)) not in result):
                             result.append(list(set(Gi)-set(not_same_group)))

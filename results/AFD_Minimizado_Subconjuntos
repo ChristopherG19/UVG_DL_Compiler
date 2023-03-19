@@ -4,6 +4,10 @@ digraph {
 	start -> A
 	start [shape=point]
 	B [shape=doublecircle]
-	A -> B [label=b]
-	B -> B [label=a]
+	C [shape=circle]
+	A -> C [label=0]
+	C -> B [label=0]
+	C -> C [label=1]
+	B -> B [label=0]
+	B -> C [label=1]
 }

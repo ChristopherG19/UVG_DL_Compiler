@@ -34,7 +34,6 @@ class node():
             elif self.symbol == "|":
                 self.leftChild.calculate_positions()
                 self.rightChild.calculate_positions()
-                
                 self.nullable = self.leftChild.nullable or self.rightChild.nullable
                 
                 self.firstpos.update(self.leftChild.firstpos)
@@ -47,8 +46,7 @@ class node():
                 self.rightChild.calculate_positions()
                 
                 self.nullable = self.leftChild.nullable and self.rightChild.nullable
-                
-                self.firstpos.update(self.leftChild.firstpos)
+
                 if self.leftChild.nullable:
                     self.firstpos.update(self.leftChild.firstpos)
                     self.firstpos.update(self.rightChild.firstpos)
