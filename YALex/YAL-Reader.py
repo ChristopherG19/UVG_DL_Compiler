@@ -12,6 +12,7 @@ class YalLector():
         self.cleanDefiniciones = {}
         self.rules = []
         self.tempRegex = ""
+        self.dirtyFunctionsRules = {}
         
     def read(self):
         with open(self.file, 'r') as file:
@@ -105,6 +106,8 @@ class YalLector():
         open_bracket = line.find('{')
         close_bracket = line.find('}')
         if open_bracket != -1 and close_bracket != -1:
+            functionRule = line[open_bracket+1:close_bracket]
+            self.dirtyFunctionsRules[line] = functionRule
             line = line[:open_bracket] + line[close_bracket+1:]
             
         return line
@@ -138,7 +141,7 @@ class YalLector():
         
         # Se elimina el último or que se agrega    
         regexAscii = regexAscii[:-1]
-        return regexAscii
+        return f'({regexAscii})'
     
     def convert_ranges(self, ranges):
         regexRanges = ""
@@ -188,7 +191,6 @@ class YalLector():
                 i += 1
                 continue
             else:
-                listAscii.append(line[i])
                 i += 1
 
         return listAscii
@@ -196,9 +198,7 @@ class YalLector():
     def get_final_regex(self):
         final_regex = self.tempRegex
         definitions = list(self.cleanDefiniciones.keys())
-        print(definitions)
         dictionaryDefs = self.cleanDefiniciones
-        print(dictionaryDefs)
         print()
         
         while(any(elem in final_regex for elem in definitions)):
@@ -210,7 +210,7 @@ class YalLector():
 
 print()
 print('-'*20)
-yal = YalLector('./yamel-tests/slr-1.yal')
+yal = YalLector('./yamel-tests/slr-4.yal')
 yal.read()
 print('-'*20)
 print()
