@@ -59,10 +59,10 @@ class YalLector():
                             
                         # Se elimina el último or que se agrega    
                         newregex = newregex[:-1]
-                        self.cleanDefiniciones[name] = newregex
+                        self.cleanDefiniciones[name] = f'({newregex})'
                                     
             else:
-                
+                desc = self.modify_desc(desc)
                 self.cleanDefiniciones[name] = desc
                 
         print()
@@ -80,13 +80,33 @@ class YalLector():
         self.tempRegex = "".join(self.rules)
 
         # Impresion definiciones
-        for key, value in self.cleanDefiniciones.items():
-            print(key, value)
-        print()
+        # for key, value in self.cleanDefiniciones.items():
+        #     print(key, value)
         print("Temp regex:",self.tempRegex)
         print()
         self.regexFinal = self.get_final_regex()
         print("Regex Final:", self.regexFinal)
+
+    def modify_desc(self, desc):
+        newDesc = ''
+        desc = desc.replace('"', '').replace("'", '')
+        elem = ''
+        in_cor = False
+        
+        for i in desc:
+            if i == '[':
+                in_cor = True
+                elem = ''
+            elif i == ']':
+                in_cor = False
+                newDesc += '('+'|'.join(elem)+')'
+                elem = ''
+            elif in_cor:
+                elem += i
+            else:
+                newDesc += i
+      
+        return newDesc
 
     def remove_comments(self, line):
         if 'rule' in line:
@@ -112,6 +132,7 @@ class YalLector():
             
         return line
     
+    # Verificar si existen caracteres de escape
     def has_escape_characters(self, line):
         escape_chars = ['\\','\n', '\r', '\t', '\b', '\f', '\v', '\a']
         for i in escape_chars:
@@ -119,6 +140,7 @@ class YalLector():
                 return True
         return False
     
+    # Se crean los rangos
     def get_ranges(self, line):
         ranges = []
         line = line.replace("'", '')
@@ -134,6 +156,7 @@ class YalLector():
         
         return ranges
     
+    # Convertir lista ascii a regex
     def convert_ascii(self, asciiCodes):
         regexAscii = ""
         for code in asciiCodes:
@@ -143,6 +166,7 @@ class YalLector():
         regexAscii = regexAscii[:-1]
         return f'({regexAscii})'
     
+    # Rangos a regex
     def convert_ranges(self, ranges):
         regexRanges = ""
         newRanges = []
@@ -163,8 +187,9 @@ class YalLector():
         # Se elimina el último or que se agrega    
         regexRanges = regexRanges[:-1]
         
-        return regexRanges
+        return f'({regexRanges})'
     
+    # Convertir a ascii los delimitadores
     def get_list_ascii(self, line):
         listAscii = []
         
@@ -194,17 +219,65 @@ class YalLector():
                 i += 1
 
         return listAscii
+    
+    # Sustitucion base
+    def change(self, elementsFR, dictionaryDefs):
+        newElementsFR = elementsFR
+        for pos, token in enumerate(newElementsFR):
+            if token in dictionaryDefs:
+                newElementsFR[pos] = dictionaryDefs[token]
+                
+        return newElementsFR
+    
+    # Determina si todavía hay tokens en la regex
+    def get_coincidencia(self, search, text):
+        palabraAc = ""
+        present = False
+        for char in text:
+            if char.isalnum():
+                palabraAc += char
+                
+            else:
+                if palabraAc == search:
+                    present = True
+                    break
+                palabraAc = ""
+        
+        return present
+
+    # Sustitucion de regex por valores de cada definición
+    def change_def(self, defi, word, dictionaryDefs):
+        indice_palabra = word.find(defi)
+        while indice_palabra != -1:
+            word = word[:indice_palabra] + dictionaryDefs[defi] + word[indice_palabra + len(defi):]
+            indice_palabra = word.find(defi)
+        return word
 
     def get_final_regex(self):
         final_regex = self.tempRegex
         definitions = list(self.cleanDefiniciones.keys())
         dictionaryDefs = self.cleanDefiniciones
-        print()
+
+        elementsFR = self.change(final_regex.split('|'), dictionaryDefs)
         
-        while(any(elem in final_regex for elem in definitions)):
-            for token in definitions:
-                if token in final_regex:
-                    final_regex = final_regex.replace(token, dictionaryDefs[token])
+        newList = elementsFR.copy()
+
+        while True:
+            changes_made = False
+            for i, regex in enumerate(newList):
+                for word in definitions:
+                    if self.get_coincidencia(word, regex):
+                        nuevadef = self.change_def(word, regex, dictionaryDefs)
+                        if nuevadef != regex:
+                            newList[i] = nuevadef
+                            changes_made = True
+                            break
+                if changes_made:
+                    break
+            if not changes_made:
+                break
+            
+        final_regex = '|'.join(newList)
                 
         return final_regex
 
