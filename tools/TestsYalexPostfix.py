@@ -1,3 +1,5 @@
+from infixToPostfix import Conversion
+
 # Universidad del Valle de Guatemala
 # Facultad de Ingeniería
 # Departamento de Ciencias de la Computación
@@ -82,11 +84,15 @@ class YalLector():
         self.tempRegex = "".join(self.rules)
 
         # Impresion definiciones
-        # for key, value in self.cleanDefiniciones.items():
-        #     print(key, value)
+        print("Definiciones procesadas")
+        for key, value in self.cleanDefiniciones.items():
+            print("->", key+":",value)
+        print()
         print("Regex sin procesar:",self.tempRegex)
         print()
         self.regexFinal = self.get_final_regex()
+        
+        # Realizar revisión para sustituir caracteres que se utilizan en automatas y evitar conflictos
         revi= self.regexFinal
         longre = len(revi)
         i = 0
@@ -101,7 +107,7 @@ class YalLector():
                     
                 if((revi[i] == '*' and revi[i-1] == '|') or (revi[i] == '*' and revi[i-1] == '(')):
                     revi = revi[:i]+str(ord('*'))+revi[i+1:]
-                
+                    
                 if((revi[i] == '.' and revi[i-1] == '|') or (revi[i] == '.' and revi[i-1] == '(')):
                     revi = revi[:i]+str(ord('.'))+revi[i+1:]
                 
@@ -110,8 +116,8 @@ class YalLector():
                         revi = revi[:i]+str(ord(revi[i]))+revi[i+1:]
             
             i += 1
-            longre = len(revi)    
-               
+            longre = len(revi)
+            
         self.regexFinal = revi
         print("Regex final en infix:")
         print(self.regexFinal)
@@ -205,7 +211,7 @@ class YalLector():
             elementsRange = []
             # Se obtienen los elementos entre cada límite del rango
             for j in range(i[0], i[1]+1):
-                elementsRange.append(j)
+                elementsRange.append(chr(j))
             newRanges.append(elementsRange)
         
         for rango in newRanges:    
@@ -313,7 +319,13 @@ class YalLector():
 
 print()
 print('-'*20)
-yal = YalLector('./yamel-tests/slr-2.yal')
+yal = YalLector('./yamel-tests/slr-1.yal')
 word = yal.read()
 print('-'*20)
+print()
+
+
+Obj = Conversion(word)
+postfixExp = Obj.infixToPostfix()
+print("Postfix: ", postfixExp)
 print()

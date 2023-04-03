@@ -5,7 +5,7 @@
 # Christopher García 20541
 
 # Clase Stack
-from tools.stack import Stack
+from stack import Stack
 
 """
     Clase Conversion
@@ -23,24 +23,57 @@ class Conversion(object):
 
     def infixToPostfix(self):
         infixNew = ""
+        infixNewV2 = ""
         postfixExp = ""
         stack = Stack()
         CantElements = len(self.infix)
-
-        # Se añade la concatenación explícita
-        for index in range(CantElements):
-            element = self.infix[index]
-            infixNew += element 
-            try:
-                if (element in '|(.'):
-                    continue
-                elif (((element in ')*+?') or (element not in '?+()*.|')) and (self.infix[index + 1] not in '+*?|)')):
-                    infixNew += '.'
-            except:
-                pass
+        inside_quotes = False
         
+        # Se verifican números compuestos
+        index = 0
+        while index < CantElements:
+            element = self.infix[index]
+            if element.isdigit():
+                # Si es un dígito, leemos el número compuesto completo
+                num_compuesto = element
+                while index + 1 < CantElements and self.infix[index+1].isdigit():
+                    num_compuesto += self.infix[index+1]
+                    index += 1
+                if(len(num_compuesto) > 1):
+                    infixNewV2 += f"'{num_compuesto}'"
+                else:
+                    infixNewV2 += num_compuesto
+            else:
+                infixNewV2 += element 
+            index += 1
+
+        print("Regex final considerando números compuestos:")
+        print(infixNewV2)
+        print()
+
+        CantElementsNew = len(infixNewV2)
+        # Se añade la concatenación explícita
+        for index in range(CantElementsNew):
+            element = infixNewV2[index]
+            infixNew += element 
+            if (element == "'"):
+                inside_quotes = not inside_quotes
+            if (element in '|(.'):
+                continue
+            if ((index+1) < len(infixNewV2)):
+                if (not inside_quotes and
+                    ((element in ')*+?') or (element not in '?+()*.|')) and 
+                    (infixNewV2[index + 1] not in '+*?|)')):
+                    infixNew += '.'
+        
+        # Primero transformar a números compuestos 
+        # y de alguna manera agregar la concatenación explícita tomando en cuenta comillas
+                
+        # countNumCom = 0
+
         # Se ordena la expresión dependiendo de la precedencia de operadores
         for element in infixNew:
+                
             if (element == '('):
                 stack.push(element)
                 
@@ -48,6 +81,15 @@ class Conversion(object):
                 while (not stack.isEmpty() and stack.peek() != '('):
                     postfixExp += stack.pop()
                 stack.pop()
+                
+            # elif (element == "'"):
+            #     countNumCom += 1
+            #     print(element, countNumCom)
+            #     stack.push(element)
+            #     if (countNumCom == 2):
+            #         while(not stack.isEmpty() and stack.peek() != '('):
+            #             postfixExp += stack.pop()
+            #         stack.pop()
             
             elif (element in self.operators):
                 while (not stack.isEmpty()):
