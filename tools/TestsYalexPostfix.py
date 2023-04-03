@@ -1,10 +1,11 @@
-from infixToPostfix import Conversion
-
 # Universidad del Valle de Guatemala
 # Facultad de Ingeniería
 # Departamento de Ciencias de la Computación
 # Diseño de lenguajes
 # Christopher García 20541
+
+from infixToPostfix import Conversion
+from components import *
 
 class YalLector():
     def __init__(self, file):

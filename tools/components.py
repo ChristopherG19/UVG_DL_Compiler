@@ -4,6 +4,18 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
+# Clase Simbolo: Representa cada simbolo del autómata
+class Simbolo():
+    def __init__(self, symbol, tipo):
+        self.symbol = symbol
+        self.type = tipo
+    
+    def __str__(self):
+        return self.symbol
+    
+    def __repr__(self):
+        return str(self)
+
 # Clase Estado: Representa cada estado del autómata
 class Estado():
     def __init__(self, stateNum):
