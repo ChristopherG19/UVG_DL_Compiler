@@ -6,6 +6,7 @@
 
 # Clase Stack
 from stack import Stack
+from components import *
 
 """
     Clase Conversion
@@ -22,101 +23,67 @@ class Conversion(object):
         self.HighestPrecedence = 5
 
     def infixToPostfix(self):
-        infixNew = ""
-        infixNewV2 = ""
-        postfixExp = ""
+        infixNew = []
+        postfixExp = []
         stack = Stack()
         CantElements = len(self.infix)
-        inside_quotes = False
-        
-        # Se verifican números compuestos
-        index = 0
-        while index < CantElements:
-            element = self.infix[index]
-            if element.isdigit():
-                # Si es un dígito, leemos el número compuesto completo
-                num_compuesto = element
-                while index + 1 < CantElements and self.infix[index+1].isdigit():
-                    num_compuesto += self.infix[index+1]
-                    index += 1
-                if(len(num_compuesto) > 1):
-                    infixNewV2 += f"'{num_compuesto}'"
-                else:
-                    infixNewV2 += num_compuesto
-            else:
-                infixNewV2 += element 
-            index += 1
 
-        print("Regex final considerando números compuestos:")
-        print(infixNewV2)
-        print()
-
-        CantElementsNew = len(infixNewV2)
         # Se añade la concatenación explícita
-        for index in range(CantElementsNew):
-            element = infixNewV2[index]
-            infixNew += element 
-            if (element == "'"):
-                inside_quotes = not inside_quotes
-            if (element in '|(.'):
+        for index in range(CantElements):
+            element = self.infix[index]
+            infixNew.append(element) 
+            if (element.label in '|(.'):
                 continue
-            if ((index+1) < len(infixNewV2)):
-                if (not inside_quotes and
-                    ((element in ')*+?') or (element not in '?+()*.|')) and 
-                    (infixNewV2[index + 1] not in '+*?|)')):
-                    infixNew += '.'
+            if ((index+1) < len(self.infix)):
+                if (((element.label in ')*+?') or (element.label not in '?+()*.|')) and 
+                    (self.infix[index + 1].label not in '+*?|)')):
+                    dotSym = Simbolo('.')
+                    dotSym.setType(True)
+                    infixNew.append(dotSym) 
         
-        # Primero transformar a números compuestos 
-        # y de alguna manera agregar la concatenación explícita tomando en cuenta comillas
-                
-        # countNumCom = 0
-
         # Se ordena la expresión dependiendo de la precedencia de operadores
         for element in infixNew:
                 
-            if (element == '('):
+            if (element.isOperator and element.label == '('):
                 stack.push(element)
                 
-            elif (element == ')'):
-                while (not stack.isEmpty() and stack.peek() != '('):
-                    postfixExp += stack.pop()
+            elif (element.isOperator and element.label == ')'):
+                while (not stack.isEmpty() and stack.peek().label != '('):
+                    postfixExp.append(stack.pop())
                 stack.pop()
-                
-            # elif (element == "'"):
-            #     countNumCom += 1
-            #     print(element, countNumCom)
-            #     stack.push(element)
-            #     if (countNumCom == 2):
-            #         while(not stack.isEmpty() and stack.peek() != '('):
-            #             postfixExp += stack.pop()
-            #         stack.pop()
             
-            elif (element in self.operators):
+            elif (element.isOperator and element.label in self.operators):
                 while (not stack.isEmpty()):
                     el = stack.peek()
-                    precedenceActualEl = self.precedencia[element]
-                    precedenceLastEl = self.precedencia[el]
+                    precedenceActualEl = self.precedencia[element.label]
+                    precedenceLastEl = self.precedencia[el.label]
 
                     if (precedenceLastEl >= precedenceActualEl):
-                        postfixExp += stack.pop()
+                        postfixExp.append(stack.pop())
                     else:
                         break
                     
                 stack.push(element)    
                     
             else:
-                postfixExp += element       
+                postfixExp.append(element)     
                     
         while (not stack.isEmpty()):
-            postfixExp += stack.pop()
-                    
+            postfixExp.append(stack.pop())
+                           
+        newSim = Simbolo('#') 
+        newSim.setType(True)
+        newSim2 = Simbolo('.') 
+        newSim2.setType(True)
+        postfixExp.append(newSim)
+        postfixExp.append(newSim2)
         return postfixExp
     
     def get_alphabet(self, expression):
         # Obtención de alfabeto
         alphabet = []
-        for i in expression:
-            if(i not in '().*+|$?' and i not in alphabet):
-                alphabet.append(i)
+        for symbol in expression:
+            if(not symbol.isOperator and symbol.label not in '().*+|$?' and symbol.label not in alphabet):
+                alphabet.append(symbol.label)
                 
         return sorted(alphabet)
