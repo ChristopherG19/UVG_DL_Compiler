@@ -8,6 +8,7 @@ from automatas.AFD import *
 from tools.tree import *
 from tools.components import *
 
+
 class directConstruction():
     def __init__(self, infix, postfix, alphabet):
         self.infix = infix

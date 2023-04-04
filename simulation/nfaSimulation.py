@@ -4,6 +4,7 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
+
 class nfaSimulation():
     def __init__(self, AFN, w):
         self.AFN = AFN
