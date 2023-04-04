@@ -46,7 +46,7 @@ class directConstruction():
         self.postfix.append(newSim2)
         
         ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.postfix]
-        print("\nPostfix: ", "".join(ls))
+        print("Postfix: ", "".join(ls))
         print()
 
     def buildDFA(self):
@@ -72,7 +72,7 @@ class directConstruction():
                 if (type(j) != str and j != None and type(j) != int and type(j) == list):
                     j = j.sort()
             
-            if (i[0] == '#'):
+            if (i[0].label == '#'):
                 numberFState = i[4]
                 
             #Imprimir árbol
@@ -96,7 +96,7 @@ class directConstruction():
                     # Buscamos en todo el árbol por las posiciones que tengan el símbolo
                     for x in t:
                         for el in FinalTree:
-                            #print(el[0].label, symbol)
+                            #print(x, el[4])
                             if x == el[4] and el[0].label == symbol:
                                 for a in el[3]:
                                     if (a not in U):
@@ -137,7 +137,7 @@ class directConstruction():
             if numberFState in values:
                 FnStates.append(key)
                 
-        print(names)
+        #print(names)
         return AFD(InState, FnStates, len(names), final_Trans, list(names.keys()))
 
 

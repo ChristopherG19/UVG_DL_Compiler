@@ -4,9 +4,7 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
-from infixToPostfix import Conversion
-from components import *
-from TestsAll import *
+from tools.components import *
 
 class YalLector():
     def __init__(self, file):
@@ -434,38 +432,3 @@ class YalLector():
         newRegex = []
         Final = self.bottom_Down(final_regex, newRegex)
         return Final
-
-print()
-yal = YalLector('./yalex-tests/slr-4.yal')
-word = yal.read()
-print()
-
-Obj = Conversion(word)
-postfixExp = Obj.infixToPostfix()
-
-print()
-alphabet = Obj.get_alphabet()
-print("Alfabeto: ", alphabet)
-
-newSim = Simbolo('#') 
-newSim2 = Simbolo('.') 
-newSim2.setType(True)
-postfixExp.append(newSim)
-postfixExp.append(newSim2)
-
-print()
-ls = [l.label if not l.isSpecialChar else repr(l.label) for l in postfixExp]
-print("Postfix: ", "".join(ls))
-print()
-
-T = Tree(postfixExp)
-T.generateTree()       
-T.print_final_Tree()
-
-# print("\n-----  AFD (Directo)  -----")
-# T = directConstruction(word, postfixExp, alphabet)
-# dfaD = T.buildDFA()
-# print(dfaD)
-# print()
-
-# showGraphDFA(dfaD, "Arbol Yal")

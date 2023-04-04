@@ -31,7 +31,11 @@ class node():
                 self.leftChild.calculate_positions()
                 self.firstpos.update(self.leftChild.firstpos)
                 self.lastpos.update(self.leftChild.lastpos)
-                self.nullable = True
+                
+                if (self.symbol.label == '?'):
+                    self.nullable = False
+                else:
+                    self.nullable = True
                   
             elif self.symbol.label == "|":
                 self.leftChild.calculate_positions()
@@ -89,16 +93,4 @@ class node():
 
         return self.elements
 
-    def __str__(self):
-        result = f"\nSymbol: {self.symbol}\n"
-        result += f"Firstpos: {[pos.number for pos in self.firstpos]}\n"
-        result += f"Lastpos: {[pos.number for pos in self.lastpos]}\n"
-        result += f"Followpos: {[pos.number for pos in self.followpos]}\n"
-        if self.leftChild:
-            result += f"Left child: {self.leftChild}\n"
-        if self.rightChild:
-            result += f"Right child: {self.rightChild}\n"
-        return result
-
-    def __repr__(self) -> str:
-        return self.symbol
+    

@@ -5,8 +5,8 @@
 # Christopher García 20541
 
 # Clase Stack
-from stack import Stack
-from components import *
+from tools.stack import Stack
+from tools.components import *
 
 """
     Clase Conversion
@@ -41,7 +41,6 @@ class Conversion(object):
         # Se añade la concatenación explícita
         for index in range(CantElements):
             element = self.infix[index]
-            # print(element, element.isOperator)
             infixNew.append(element) 
             if ((index+1) < len(self.infix)):
                 if (element.isOperator):
@@ -64,8 +63,14 @@ class Conversion(object):
                         dotSym.setType(True)
                         infixNew.append(dotSym) 
         
+        print()
+        ls = [l.label if not l.isSpecialChar else repr(l.label) for l in infixNew]
+        print("Regex final infix Concatenaciones: ", "".join(ls))
+        print()
+        
         # Se ordena la expresión dependiendo de la precedencia de operadores
         for element in infixNew:
+            #print(element, element.isOperator)
             if (element.isOperator and element.label == '('):
                 stack.push(element)
                 

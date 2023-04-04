@@ -12,7 +12,8 @@ from simulation.nfaSimulation import *
 from simulation.dfaSimulation import *
 from automatas.construccionDirecta import *
 from automatas.minimizacion import *
-
+from tools.YALReader import *
+ 
 ''' Expresiones pruebas '''
 # word = '(a*|b*)c' 
 # word = '(b|b)*abb(a|b)*' 
@@ -38,71 +39,85 @@ from automatas.minimizacion import *
 # word = '(a|ε)b(a+)c?' 
 # word = '(a|b)*a(a|b)(a|b)' 
 
-word = 'a(a|b|c)bc'
-cadena = 'aabc'
+# word = 'a(a|b|c)bc'
+# cadena = 'aabc'
+
+yal = YalLector('./yalex-tests/slr-4.yal')
+word = yal.read()
 
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
 alphabet = Obj.get_alphabet()
-print("Infix: ", word)
+print("Alfabeto: ", alphabet)
+
+newSim = Simbolo('#') 
+newSim2 = Simbolo('.') 
+newSim2.setType(True)
+postfixExp.append(newSim)
+postfixExp.append(newSim2)
+
+print()
 ls = [l.label if not l.isSpecialChar else repr(l.label) for l in postfixExp]
 print("Postfix: ", "".join(ls))
-print("Alfabeto: ", alphabet)
 print()
 
-print("-----  AFN (Thompson) -----")
-nfaCons = Construction(word, postfixExp, alphabet)
-nfa = nfaCons.Thompson_Construction()
-print(nfa)
-print()
+T = Tree(postfixExp)
+T.generateTree()       
+T.print_final_Tree()
 
-showGraphNFA(nfa, "Thompson")
+# print("-----  AFN (Thompson) -----")
+# nfaCons = Construction(word, postfixExp, alphabet)
+# nfa = nfaCons.Thompson_Construction()
+# print(nfa)
+# print()
 
-print("-----  AFD (Subconjuntos) -----")
-dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
-dfaS = dfaSub.subconjuntos_construction()
-print(dfaS)
-print()
+# showGraphNFA(nfa, "Thompson")
 
-showGraphDFA(dfaS, "Subconjuntos")
+# print("-----  AFD (Subconjuntos) -----")
+# dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
+# dfaS = dfaSub.subconjuntos_construction()
+# print(dfaS)
+# print()
 
-print("-----  AFD (Directo)  -----")
-T = directConstruction(word, postfixExp, alphabet)
-dfaD = T.buildDFA()
-print(dfaD)
-print()
+# showGraphDFA(dfaS, "Subconjuntos")
 
-showGraphDFA(dfaD, "Directo")
+# print("-----  AFD (Directo)  -----")
+# T = directConstruction(word, postfixExp, alphabet)
+# dfaD = T.buildDFA()
+# print(dfaD)
+# print()
 
-print("-----  AFD Minimizado (Subconjuntos) -----")
-miniS = Minimizador(dfaS, alphabet)
-dfaMinS = miniS.minimize_afd()
-print(dfaMinS)
-print()
+# showGraphDFA(dfaD, "Directo")
 
-showGraphDFA(dfaMinS, "Minimizado_Subconjuntos")
+# print("-----  AFD Minimizado (Subconjuntos) -----")
+# miniS = Minimizador(dfaS, alphabet)
+# dfaMinS = miniS.minimize_afd()
+# print(dfaMinS)
+# print()
 
-print("-----  AFD Minimizado (Directo) -----")
-miniD = Minimizador(dfaD, alphabet)
-dfaMinD = miniD.minimize_afd()
-print(dfaMinD)
-print()
+# showGraphDFA(dfaMinS, "Minimizado_Subconjuntos")
 
-showGraphDFA(dfaMinD, "Minimizado_Directo")
+# print("-----  AFD Minimizado (Directo) -----")
+# miniD = Minimizador(dfaD, alphabet)
+# dfaMinD = miniD.minimize_afd()
+# print(dfaMinD)
+# print()
 
-nfaS = nfaSimulation(nfa, cadena)
-print(f"(Thompson) Cadena ingresada: {cadena} | Resultado: {nfaS.Simulation()} es aceptada")
+# showGraphDFA(dfaMinD, "Minimizado_Directo")
 
-dfaSSim = dfaSimulation(dfaS, cadena)
-print(f"(Subconjuntos) Cadena ingresada: {cadena} | Resultado: {dfaSSim.Simulation()} es aceptada")
+# nfaS = nfaSimulation(nfa, cadena)
+# print(f"(Thompson) Cadena ingresada: {cadena} | Resultado: {nfaS.Simulation()} es aceptada")
 
-dfaDSim = dfaSimulation(dfaD, cadena)
-print(f"(Directo) Cadena ingresada: {cadena} | Resultado: {dfaDSim.Simulation()} es aceptada")
+# dfaSSim = dfaSimulation(dfaS, cadena)
+# print(f"(Subconjuntos) Cadena ingresada: {cadena} | Resultado: {dfaSSim.Simulation()} es aceptada")
 
-minDfaSSim = dfaSimulation(dfaMinS, cadena)
-print(f"(SC minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaSSim.Simulation()} es aceptada")
+# dfaDSim = dfaSimulation(dfaD, cadena)
+# print(f"(Directo) Cadena ingresada: {cadena} | Resultado: {dfaDSim.Simulation()} es aceptada")
 
-minDfaDSim = dfaSimulation(dfaMinD, cadena)
-print(f"(D minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaDSim.Simulation()} es aceptada")
+# minDfaSSim = dfaSimulation(dfaMinS, cadena)
+# print(f"(SC minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaSSim.Simulation()} es aceptada")
+
+# minDfaDSim = dfaSimulation(dfaMinD, cadena)
+# print(f"(D minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaDSim.Simulation()} es aceptada")
 
 print()
