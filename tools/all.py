@@ -4,28 +4,60 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
-from automatas.AFD import *
-from tools.tree import *
-from tools.components import *
+# Universidad del Valle de Guatemala
+# Facultad de Ingeniería
+# Departamento de Ciencias de la Computación
+# Diseño de lenguajes
+# Christopher García 20541
+
+from components import *
+from tree import *
+
+# Clase AFD: Representa los AFD's creados
+class AFD():
+    def __init__(self, InState, FnState, numStates, transitions, states):
+        self.numStates = numStates
+        
+        self.states = states
+        self.initialState = InState
+        self.finalStates = FnState
+        self.transitions = transitions
+    
+    def __str__(self):
+        return f"No. Estados: {self.numStates}\nEstados: {self.states}\nEstado inicial: {self.initialState}\nEstado o estados finales: {self.finalStates}\nTransiciones: {self.transitions}"
+
+# Universidad del Valle de Guatemala
+# Facultad de Ingeniería
+# Departamento de Ciencias de la Computación
+# Diseño de lenguajes
+# Christopher García 20541
 
 class directConstruction():
     def __init__(self, infix, postfix, alphabet):
         self.infix = infix
         self.postfix = postfix
         self.alphabet = alphabet
+        self.letterSymbols = {}
+        
         newSim = Simbolo('#') 
         newSim2 = Simbolo('.') 
         newSim2.setType(True)
         self.postfix.append(newSim)
         self.postfix.append(newSim2)
-        self.letterSymbols = {}
+        
+        ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.postfix]
+        print("\nPostfix: ", "".join(ls))
+        print()
 
     def buildDFA(self):
         T = Tree(self.postfix)
-        self.Tree = T.generateTree()        
+        self.Tree = T.generateTree()       
         self.Tree.calculate_positions()
         
         FinalTree = self.Tree.traverse_tree(self.Tree)
+        
+        # print(self.alphabet)
+        # print(self.Tree)
 
         inState = sorted(FinalTree[0][1])
         InState = None
@@ -37,7 +69,7 @@ class directConstruction():
         
         for i in FinalTree:
             for j in i:
-                if (type(j) != str and j != None and type(j) != int):
+                if (type(j) != str and j != None and type(j) != int and type(j) == list):
                     j = j.sort()
             
             if (i[0] == '#'):
@@ -46,6 +78,7 @@ class directConstruction():
             #Imprimir árbol
             # print(i)
 
+        #print()
         # Se sigue el pseudocódigo proporcionado por el libro del dragón
         Dstates = []
         Dstates.append(inState)
@@ -63,7 +96,8 @@ class directConstruction():
                     # Buscamos en todo el árbol por las posiciones que tengan el símbolo
                     for x in t:
                         for el in FinalTree:
-                            if x == el[4] and el[0] == symbol:
+                            #print(el[0].label, symbol)
+                            if x == el[4] and el[0].label == symbol:
                                 for a in el[3]:
                                     if (a not in U):
                                         U.append(a)      
@@ -106,6 +140,61 @@ class directConstruction():
         print(names)
         return AFD(InState, FnStates, len(names), final_Trans, list(names.keys()))
 
+
+# Universidad del Valle de Guatemala
+# Facultad de Ingeniería
+# Departamento de Ciencias de la Computación
+# Diseño de lenguajes
+# Christopher García 20541
+
+import graphviz
+
+# Función para mostrar AFN's
+def showGraphNFA(nfa, metodo):
+    g = graphviz.Digraph(comment="AFN")
+
+    g.attr(rankdir='LR')
+
+    for estado in nfa.states:
+        if estado == nfa.initialState and estado == nfa.finalState:
+            g.edge('start', str(estado))
+            
+        if estado == nfa.initialState:
+            g.edge('start', str(estado))
+            g.node('start', shape='point')
+        elif estado == nfa.finalState:
+            g.node(str(estado), shape='doublecircle')
+        else:
+            g.node(str(estado), shape='circle')
+
+    for transicion in nfa.transitions:
+        origen, simbolo, destino = transicion.inState, transicion.symbol, transicion.fnState
+        g.edge(str(origen), str(destino), label=str(simbolo))
         
+    g.render(f'results/AFN_{metodo}',format='png')
+
+# Función para mostrar AFD's
+def showGraphDFA(dfa, metodo):
+    g = graphviz.Digraph(comment="AFD")
+
+    g.attr(rankdir='LR')
+
+    for estado in dfa.states:
+        if estado == dfa.initialState and estado in dfa.finalStates:
+            g.node(str(estado), shape='doublecircle')
+            
+        if estado == dfa.initialState:
+            g.edge('start', str(estado))
+            g.node('start', shape='point')
+        elif estado in dfa.finalStates:
+            g.node(str(estado), shape='doublecircle')
+        else:
+            g.node(str(estado), shape='circle')
+
+    for transicion in dfa.transitions:
+        origen, simbolo, destino = transicion.inState, transicion.symbol, transicion.fnState
+        g.edge(str(origen), str(destino), label=str(simbolo))
+        
+    g.render(f'results/AFD_{metodo}', format='png')    
 
         

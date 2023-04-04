@@ -52,7 +52,7 @@ class Construction(object):
     # Algoritmo principal que lee la expresión y construye el AFN que se retorna
     def Thompson_Construction(self):
         for i in self.postfixExp:
-            self.Thompson_Components(i)
+            self.Thompson_Components(i.label)
             
         self.AFNS[0].numStates = len(self.AFNS[0].states)
         return self.AFNS[0]

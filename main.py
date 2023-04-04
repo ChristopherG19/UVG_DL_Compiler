@@ -43,9 +43,10 @@ cadena = 'aabc'
 
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
-alphabet = Obj.get_alphabet(word)
+alphabet = Obj.get_alphabet()
 print("Infix: ", word)
-print("Postfix: ", postfixExp)
+ls = [l.label if not l.isSpecialChar else repr(l.label) for l in postfixExp]
+print("Postfix: ", "".join(ls))
 print("Alfabeto: ", alphabet)
 print()
 

@@ -17,21 +17,23 @@ class node():
         self.nullable = False
         
     def calculate_positions(self):
-        if self.symbol not in ".|*+?":
-            if self.symbol == 'ε':
+        
+        #print("---------> ", self.symbol, self.symbol.isOperator)
+        if not self.symbol.isOperator:
+            if self.symbol.label == 'ε':
                 self.nullable = True
             else:
                 self.firstpos.add(self)
                 self.lastpos.add(self)
                 self.nullable = False
         else:
-            if self.symbol in "*+?":
+            if self.symbol.label in "*+?":
                 self.leftChild.calculate_positions()
                 self.firstpos.update(self.leftChild.firstpos)
                 self.lastpos.update(self.leftChild.lastpos)
                 self.nullable = True
                   
-            elif self.symbol == "|":
+            elif self.symbol.label == "|":
                 self.leftChild.calculate_positions()
                 self.rightChild.calculate_positions()
                 self.nullable = self.leftChild.nullable or self.rightChild.nullable
@@ -41,12 +43,12 @@ class node():
                 self.lastpos.update(self.leftChild.lastpos)
                 self.lastpos.update(self.rightChild.lastpos)
                 
-            elif self.symbol == ".":
+            elif self.symbol.label == ".":
                 self.leftChild.calculate_positions()
                 self.rightChild.calculate_positions()
                 
                 self.nullable = self.leftChild.nullable and self.rightChild.nullable
-
+                
                 if self.leftChild.nullable:
                     self.firstpos.update(self.leftChild.firstpos)
                     self.firstpos.update(self.rightChild.firstpos)
@@ -62,15 +64,16 @@ class node():
         self.calculate_followpos()
 
     def calculate_followpos(self):
-        if self.symbol == ".":
-            for position in self.leftChild.lastpos:
-                position.followpos.update(self.rightChild.firstpos)
+        if self.symbol.isOperator:
+            if self.symbol.label == ".":
+                for position in self.leftChild.lastpos:
+                    position.followpos.update(self.rightChild.firstpos)
                 
-        elif self.symbol in "*+":
-            for position in self.leftChild.lastpos:
-                position.followpos.update(self.leftChild.firstpos)
-                
-        elif self.symbol == "ε":
+            elif self.symbol.label == "*" or self.symbol.label == "+":
+                for position in self.leftChild.lastpos:
+                    position.followpos.update(self.leftChild.firstpos)
+        
+        elif self.symbol.label == "ε":
             pass
     
     def traverse_tree(self, node):
@@ -96,3 +99,6 @@ class node():
         if self.rightChild:
             result += f"Right child: {self.rightChild}\n"
         return result
+
+    def __repr__(self) -> str:
+        return self.symbol

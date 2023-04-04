@@ -23,6 +23,16 @@ class Conversion(object):
         self.HighestPrecedence = 5
 
     def infixToPostfix(self):
+        
+        newInfix = []
+        if(type(self.infix) == str):
+            for i in self.infix:
+                newSym = Simbolo(i)
+                if i in self.operators or i in '()':
+                    newSym.setType(True)
+                newInfix.append(newSym)
+            self.infix = newInfix
+        
         infixNew = []
         postfixExp = []
         stack = Stack()
@@ -31,19 +41,31 @@ class Conversion(object):
         # Se añade la concatenación explícita
         for index in range(CantElements):
             element = self.infix[index]
+            # print(element, element.isOperator)
             infixNew.append(element) 
-            if (element.label in '|(.'):
-                continue
             if ((index+1) < len(self.infix)):
-                if (((element.label in ')*+?') or (element.label not in '?+()*.|')) and 
-                    (self.infix[index + 1].label not in '+*?|)')):
-                    dotSym = Simbolo('.')
-                    dotSym.setType(True)
-                    infixNew.append(dotSym) 
+                if (element.isOperator):
+                    if(element.label in '*+?)'):
+                        if(not self.infix[index + 1].isOperator or self.infix[index + 1].label == '('):
+                            dotSym = Simbolo('.')
+                            dotSym.setType(True)
+                            infixNew.append(dotSym) 
+                elif (not element.isOperator):
+                    if(not self.infix[index + 1].isOperator):
+                        dotSym = Simbolo('.')
+                        dotSym.setType(True)
+                        infixNew.append(dotSym) 
+                    elif(self.infix[index + 1].label == '('):
+                        dotSym = Simbolo('.')
+                        dotSym.setType(True)
+                        infixNew.append(dotSym) 
+                    elif(self.infix[index + 1].label == 'ε'):
+                        dotSym = Simbolo('.')
+                        dotSym.setType(True)
+                        infixNew.append(dotSym) 
         
         # Se ordena la expresión dependiendo de la precedencia de operadores
         for element in infixNew:
-                
             if (element.isOperator and element.label == '('):
                 stack.push(element)
                 
@@ -71,19 +93,13 @@ class Conversion(object):
         while (not stack.isEmpty()):
             postfixExp.append(stack.pop())
                            
-        newSim = Simbolo('#') 
-        newSim.setType(True)
-        newSim2 = Simbolo('.') 
-        newSim2.setType(True)
-        postfixExp.append(newSim)
-        postfixExp.append(newSim2)
         return postfixExp
     
-    def get_alphabet(self, expression):
+    def get_alphabet(self):
         # Obtención de alfabeto
         alphabet = []
-        for symbol in expression:
-            if(not symbol.isOperator and symbol.label not in '().*+|$?' and symbol.label not in alphabet):
+        for symbol in self.infix:
+            if(not symbol.isOperator and symbol.label not in alphabet):
                 alphabet.append(symbol.label)
                 
         return sorted(alphabet)

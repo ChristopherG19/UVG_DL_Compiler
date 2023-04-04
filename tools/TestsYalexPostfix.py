@@ -138,12 +138,12 @@ class YalLector():
                     i += 2
                     continue
                 elif i < len(line) - 1 and line[i+1] == 's':
-                    listAscii.append('°')
+                    listAscii.append(ord(' '))
                     i += 2
                     continue
             elif line[i] in (' ', '\t', '\n'):
                 if (line[i] == ' '):
-                    listAscii.append('°')
+                    listAscii.append(ord(' '))
                 else:
                     listAscii.append(ord(line[i]))
                 i += 1
@@ -209,6 +209,9 @@ class YalLector():
             name = partes[0].strip()  # la primera parte es 'id'
             func = '{' + partes[1]    # la segunda parte es '{ return ID }'
                     
+        if name == ":=":
+            name = ":"   
+
         for defi in self.cleanDefiniciones:
             if defi.name == name:
                 defi.func = func
@@ -287,10 +290,15 @@ class YalLector():
                 if elem != '':
                     sym = Simbolo(elem)
                     newDesc.append(sym)
+                    
+                if elem == '_':
+                    sym = Simbolo(elem)
+                    newDesc.append(sym)
         
                 if char == '[':
                     in_cor = True
                     newSim = Simbolo('(')
+                    newSim.setType(True)
                     newDesc.append(newSim)
 
                 elif char == ']':
@@ -301,6 +309,7 @@ class YalLector():
                         newDesc.append(symS)
                     newDesc.pop()
                     newSim = Simbolo(')')
+                    newSim.setType(True)
                     newDesc.append(newSim)
                     elemCor = ''
                 elif in_cor:
@@ -343,6 +352,9 @@ class YalLector():
             line = line.replace(' ', '')
     
             line = line.strip()
+
+            if(line.startswith(':=')):
+                line = line.replace('=',"")
 
             # Eliminar las llaves y su contenido
             open_bracket = line.find('{')
@@ -414,16 +426,15 @@ class YalLector():
         return Final
 
 print()
-yal = YalLector('./yalex-tests/slr-1.yal')
+yal = YalLector('./yalex-tests/slr-4.yal')
 word = yal.read()
 print()
 
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
-ls = [l.label if not l.isSpecialChar else repr(l.label) for l in postfixExp]
-print("Postfix: ", "".join(ls))
+
 print()
-alphabet = Obj.get_alphabet(word)
+alphabet = Obj.get_alphabet()
 print("Alfabeto: ", alphabet)
 
 print("-----  AFD (Directo)  -----")
