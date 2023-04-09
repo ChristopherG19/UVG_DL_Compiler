@@ -54,7 +54,7 @@ class Tree():
     def print_final_Tree(self, node=None, level=0):
         dot = Digraph()
         self.create_node_graph(self.root, dot)
-        dot.render('tree.gv', view=True)
+        dot.render('./resultsYALex/tree_yal4.gv', view=True)
             
         
         

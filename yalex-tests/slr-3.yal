@@ -4,7 +4,7 @@
 
 let delim = [' ''\t''\n']
 let ws = delim+
-let digit = ["0123"]
+let digit = ["0123456789"]
 let digits = digit+
 let number = digits(.digits)?('E'['+''-']?digits)?
 
