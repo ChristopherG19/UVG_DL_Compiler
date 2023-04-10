@@ -38,8 +38,8 @@ from automatas.minimizacion import *
 # word = '(a|ε)b(a+)c?' 
 # word = '(a|b)*a(a|b)(a|b)' 
 
-word = 'a(a|b|c)bc'
-cadena = 'aabc'
+word = '(a|b)*a(a|b)(a|b)'
+cadena = 'aab'
 
 Obj = Conversion(word)
 postfixExp = Obj.infixToPostfix()
