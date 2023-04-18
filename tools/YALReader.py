@@ -14,31 +14,63 @@ class YalLector():
         self.cleanDefiniciones = []
         self.rules = []
         self.tempRegex = ""
-        self.dirtyFunctionsRules = {}
-        
+
     def read(self):
         with open(self.file, 'r') as file:
             lines = file.readlines()
             
+        lines_without_c = []
         capturing_rules = False
+        comment = False
         for line in lines:
-            if(line.startswith('(*')):
+            line = line.strip()
+            if not line:
                 continue
-            if(line.startswith('let')):
-                self.definiciones.append(line)
-                
-            if(line.startswith('rule')):
-                capturing_rules = True
             
-            if capturing_rules:
-                if line != "\n" or line != " ":
-                    self.rules.append(line)
+            temp = ""
+            for symbol in range(len(line)):
+                if not comment:
+                    if line[symbol] == '(':
+                        if line[symbol+1] == '*':
+                            comment = True
+                            continue
+                        else:
+                            temp += line[symbol]
+                    else:
+                        temp += line[symbol]
+                else:
+                    if line[symbol] == '*':
+                        if line[symbol+1] == ')':
+                            continue
+                    elif line[symbol] == ')':
+                        if line[symbol-1] == '*':
+                            comment = False
+                            continue
+                    
+            
+            NewLine = temp.strip()
+            if NewLine:
+                lines_without_c.append(temp.strip())
 
+        for pos, cleanLine in enumerate(lines_without_c):
+            split_line_temp = cleanLine.strip().split("=")
+            if len(split_line_temp) == 2:
+                leftSide, rightSide = (el.strip() for el in split_line_temp)
+                if(cleanLine.split("=")[0].strip().split(" ")[0] == "let"):
+                    self.definiciones.append(cleanLine)
+                elif(cleanLine.split("=")[0].strip().split(" ")[0] == "rule"):
+                    for i in range(pos, len(lines_without_c)):
+                        self.rules.append(lines_without_c[i].strip())                     
+                    break
+                else:
+                    print("\nArchivo YAL posee errores en las definiciones o rules\n")
+                    return "ERROR"
+        
         # Definiciones
         print("Definiciones:")
         for i in self.definiciones:
             print("\t","-"*40)
-            print("\t-> ", i, end='')
+            print("\t-> ", i)
             print("\t","-"*40)
 
         # Limpiar definiciones y crear diccionario de llave(token), valor(descripción)
@@ -46,7 +78,6 @@ class YalLector():
             name_desc = defin.split('=')
             name = name_desc[0].split(' ')[1]
             desc = name_desc[1].strip()
-            
             if(desc.startswith('[') and desc.endswith(']')):
                 if(self.has_escape_characters(desc)):
                     asciiCodes = self.get_list_ascii(desc)
@@ -60,7 +91,7 @@ class YalLector():
                         newDef = Definition(name, regexRanges)
                         self.cleanDefiniciones.append(newDef)
                     else:
-                        desc = desc.replace('[', '').replace(']', '').replace('"', '')
+                        desc = desc.replace('[', '').replace(']', '').replace('"', '').replace("'", "")
                         newregex = []
                         for ch in desc:
                             sym = Simbolo(ch)
@@ -88,18 +119,15 @@ class YalLector():
         print()
         # Limpieza de rules
         self.rules.remove(self.rules[0])
-        self.rules.remove(self.rules[-1])
         
+        # Se obtiene la regex temporal sin procesar
         self.tempRegex = self.get_rule_regex(self.rules)
-        
-        for j in self.rules:
-            self.create_descriptions(j)
 
         print("Definiciones procesadas (completas)")
         for definition in self.cleanDefiniciones:
-            print("-"*80)
+            print("-"*70)
             print(definition.lintDesc())
-            print("-"*80)
+            print("-"*70)
             print()
 
         print()
@@ -107,8 +135,6 @@ class YalLector():
         print("Regex sin procesar:", "".join(ls))
         print()
         
-        #self.tempRegex = self.convert_to_defs()
-
         self.regexFinal = self.get_final_regex()
         ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.regexFinal]
         print("Regex final en infix:", "".join(ls))
@@ -187,47 +213,6 @@ class YalLector():
         
         return regexAscii
 
-    # Se crean las definiciones: Token, Descripcion y Funcion
-    def create_descriptions(self, line):
-        while '(*' in line:
-            start = line.find('(*')
-            end = line.find('*)', start) + 2
-            line = line[:start] + line[end:]
-
-        # Eliminar comillas y espacios en blanco
-        line = line.replace("|", '', 1)
-        line = line.replace("'", '')
-        line = line.replace('"', '')
-        
-        line = line.strip()
-
-        name = ""
-        func = None
-
-        temp = line.split()
-        if(len(temp) == 1):
-            name = temp[0]
-
-        if ('{' in line and '}'):
-            partes = line.split('{')
-            name = partes[0].strip()  # la primera parte es 'id'
-            func = '{' + partes[1]    # la segunda parte es '{ return ID }'
-                    
-        if name == ":=":
-            name = ":"   
-
-        for defi in self.cleanDefiniciones:
-            if defi.name == name:
-                defi.func = func
-            
-        names = [defin.name for defin in self.cleanDefiniciones]
-
-        if name not in names:
-            newDef = Definition(name, None, func)
-            self.cleanDefiniciones.append(newDef)
-            
-        return line
-
     # Se crean los rangos
     def get_ranges(self, line):
         ranges = []
@@ -276,8 +261,9 @@ class YalLector():
         
         return regexRanges
     
+    # Se modifican las descripciones para que tomen un formato adecuado
     def modify_desc(self, desc):
-        desc = desc.replace('"', '').replace("'", '')
+        desc = desc.replace('"', '').replace("'", '').replace(" ", "")
         
         newDesc = []
         elemCor = ''
@@ -340,6 +326,7 @@ class YalLector():
             
         return newDesc
     
+    # Se obtiene la regex a partir de rule
     def get_rule_regex(self, rules):
         
         regex_list = []
@@ -347,31 +334,44 @@ class YalLector():
         symS = Simbolo('|')
         symS.setType(True)
         
+        tempL = ""
         for line in rules:
-            while '(*' in line:
-                start = line.find('(*')
-                end = line.find('*)', start) + 2
-                line = line[:start] + line[end:]
-
             # Eliminar comillas y espacios en blanco
-            line = line.replace("|", '', 1)
             line = line.replace("'", '')
             line = line.replace('"', '')
-            line = line.replace(' ', '')
     
             line = line.strip()
-
-            if(line.startswith(':=')):
-                line = line.replace('=',"")
-
-            # Eliminar las llaves y su contenido
-            open_bracket = line.find('{')
-            close_bracket = line.find('}')
-            if open_bracket != -1 and close_bracket != -1:
-                line = line[:open_bracket] + line[close_bracket+1:]
-                    
-            regex_list.append(line)
+                
+            tempL += line + " "
+        
+        # Se limpian espacios extra
+        listTokensDef = []
+        for TokenDef in tempL.split("|"):
+            parts = TokenDef.strip().split(" ", 1)  
+            if len(parts) == 1:
+                listTokensDef.append([parts[0].strip(), None])
+            else:
+                listTokensDef.append([parts[0].strip(), parts[1].strip()])
             
+        # Se obtienen los tokens para la regex y se guarda la descripción
+        for el in listTokensDef:
+            name, func = el
+            if name == ":=":
+                name = "→" 
+                
+            # Se agrega a la lista del regex
+            regex_list.append(name.strip())
+            
+            # Se crean las definiciones
+            for defi in self.cleanDefiniciones:
+                if defi.name == name:
+                    defi.func = func
+        
+            names = [defin.name for defin in self.cleanDefiniciones]
+            if name not in names:
+                newDef = Definition(name, None, func)
+                self.cleanDefiniciones.append(newDef)
+        
         for symbol in regex_list:
             sym = Simbolo(symbol)
             regex_symbols.append(sym)
@@ -381,22 +381,7 @@ class YalLector():
         regex_symbols = regex_symbols[:-1]
         return regex_symbols
 
-    def convert_to_defs(self):
-        newTemp = []
-        symS = Simbolo('|')
-        symS.setType(True)
-        
-        for t in self.tempRegex:
-            for defi in self.cleanDefiniciones:
-                if defi.name == t.label:
-                    newTemp.append(defi)
-                    newTemp.append(symS)
-      
-        # Se elimina el último or que se agrega    
-        newTemp = newTemp[:-1]
-
-        return newTemp
-
+    # Se determina si un token es o no un terminal
     def isTerminal(self, token):
         for defi in self.cleanDefiniciones:
             if (defi.name == token.label):
@@ -404,12 +389,14 @@ class YalLector():
                     return False
         return True
 
+    # Se obtiene la definicion de un token
     def get_definition(self, token):
         for defi in self.cleanDefiniciones:
             if (defi.name == token.label):
                 if(defi.desc != None):
                     return defi.desc
 
+    # Algoritmo bottom_down para lectura de tokens y definiciones
     def bottom_Down(self, actualT, newRegex):
         for tok in actualT:
             if(not self.isTerminal(tok)):
@@ -427,6 +414,7 @@ class YalLector():
                 
         return newRegex
 
+    # Regex final con las sustituciones hechas
     def get_final_regex(self):
         final_regex = self.tempRegex
         newRegex = []

@@ -42,7 +42,8 @@ from tools.YALReader import *
 # word = 'a(a|b|c)bc'
 # cadena = 'aabc'
 
-yal = YalLector('./yalex-tests/slr-4.yal')
+nameFile = "slr-0"
+yal = YalLector(f'./yalex-tests/{nameFile}.yal')
 word = yal.read()
 
 Obj = Conversion(word)
@@ -63,7 +64,7 @@ print()
 
 T = Tree(postfixExp)
 T.generateTree()       
-T.print_final_Tree()
+T.print_final_Tree(f"tree_yal{nameFile[-1]}")
 
 # print("-----  AFN (Thompson) -----")
 # nfaCons = Construction(word, postfixExp, alphabet)
