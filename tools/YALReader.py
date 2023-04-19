@@ -53,7 +53,7 @@ class YalLector():
                 lines_without_c.append(temp.strip())
 
         for pos, cleanLine in enumerate(lines_without_c):
-            split_line_temp = cleanLine.strip().split("=")
+            split_line_temp = cleanLine.strip().split("=", 1)
             if len(split_line_temp) == 2:
                 leftSide, rightSide = (el.strip() for el in split_line_temp)
                 if(cleanLine.split("=")[0].strip().split(" ")[0] == "let"):
@@ -75,7 +75,7 @@ class YalLector():
 
         # Limpiar definiciones y crear diccionario de llave(token), valor(descripción)
         for defin in self.definiciones:
-            name_desc = defin.split('=')
+            name_desc = defin.split('=', 1)
             name = name_desc[0].split(' ')[1]
             desc = name_desc[1].strip()
             if(desc.startswith('[') and desc.endswith(']')):

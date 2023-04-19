@@ -9,6 +9,7 @@ let letter = ['A'-'Z''a'-'z']
 
 let digit = ['0123456789']
    let id = letter (letter | digit)*
+let equal = ["="]
 
 rule tokens = 
     ws  {return NONE}

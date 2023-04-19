@@ -42,7 +42,7 @@ from tools.YALReader import *
 # word = 'a(a|b|c)bc'
 # cadena = 'aabc'
 
-nameFile = "slr-0"
+nameFile = "slr-1"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
 word = yal.read()
 
