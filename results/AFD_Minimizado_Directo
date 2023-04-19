@@ -4,6 +4,27 @@ digraph {
 	A [shape=doublecircle]
 	start -> A
 	start [shape=point]
+	B [shape=doublecircle]
+	A -> B [label="	"]
+	A -> B [label="
+"]
+	A -> B [label=" "]
+	A -> B [label="("]
+	A -> B [label=")"]
+	A -> B [label="*"]
+	A -> B [label="+"]
+	A -> A [label=A]
+	A -> A [label=B]
+	A -> A [label=C]
+	A -> A [label=a]
+	A -> A [label=b]
+	A -> A [label=c]
+	B -> B [label="	"]
+	B -> B [label="
+"]
+	B -> B [label=" "]
 	A -> A [label=0]
 	A -> A [label=1]
+	A -> A [label=2]
+	A -> A [label=3]
 }

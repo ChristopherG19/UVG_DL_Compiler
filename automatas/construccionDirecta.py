@@ -38,10 +38,10 @@ class directConstruction():
         
         for i in FinalTree:
             for j in i:
-                if (type(j) != str and j != None and type(j) != int):
+                if (type(j) == list):
                     j = j.sort()
             
-            if (i[0] == '#'):
+            if (i[0].label == '#'):
                 numberFState = i[4]
                 
             #Imprimir árbol
@@ -64,7 +64,7 @@ class directConstruction():
                     # Buscamos en todo el árbol por las posiciones que tengan el símbolo
                     for x in t:
                         for el in FinalTree:
-                            if x == el[4] and el[0] == symbol:
+                            if x == el[4] and el[0].label == symbol:
                                 for a in el[3]:
                                     if (a not in U):
                                         U.append(a)      

@@ -39,10 +39,10 @@ from tools.YALReader import *
 # word = '(a|ε)b(a+)c?' 
 # word = '(a|b)*a(a|b)(a|b)' 
 
-# word = 'a(a|b|c)bc'
+# word = '(a|b)*a(a|b)(a|b)'
 # cadena = 'aabc'
 
-nameFile = "slr-1"
+nameFile = "slr-4"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
 word = yal.read()
 
@@ -54,17 +54,18 @@ print("Alfabeto: ", alphabet)
 newSim = Simbolo('#') 
 newSim2 = Simbolo('.') 
 newSim2.setType(True)
-postfixExp.append(newSim)
-postfixExp.append(newSim2)
+NPos = postfixExp.copy()
+NPos.append(newSim)
+NPos.append(newSim2)
 
 print()
-ls = [l.label if not l.isSpecialChar else repr(l.label) for l in postfixExp]
+ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
 print("Postfix: ", "".join(ls))
 print()
 
-T = Tree(postfixExp)
-T.generateTree()       
-T.print_final_Tree(f"tree_yal{nameFile[-1]}")
+# T = Tree(NPos)
+# T.generateTree()       
+# T.print_final_Tree(f"tree_yal{nameFile[-1]}")
 
 # print("-----  AFN (Thompson) -----")
 # nfaCons = Construction(word, postfixExp, alphabet)
@@ -82,13 +83,13 @@ T.print_final_Tree(f"tree_yal{nameFile[-1]}")
 
 # showGraphDFA(dfaS, "Subconjuntos")
 
-# print("-----  AFD (Directo)  -----")
-# T = directConstruction(word, postfixExp, alphabet)
-# dfaD = T.buildDFA()
-# print(dfaD)
-# print()
+print("-----  AFD (Directo)  -----")
+T = directConstruction(word, postfixExp, alphabet)
+dfaD = T.buildDFA()
+print(dfaD)
+print()
 
-# showGraphDFA(dfaD, "Directo")
+showGraphDFA(dfaD, "Directo")
 
 # print("-----  AFD Minimizado (Subconjuntos) -----")
 # miniS = Minimizador(dfaS, alphabet)

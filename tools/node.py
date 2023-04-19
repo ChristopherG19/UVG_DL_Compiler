@@ -32,10 +32,10 @@ class node():
                 self.firstpos.update(self.leftChild.firstpos)
                 self.lastpos.update(self.leftChild.lastpos)
                 
-                if (self.symbol.label == '?'):
-                    self.nullable = False
-                else:
+                if (self.symbol.label in '*?' or self.leftChild.nullable):
                     self.nullable = True
+                else:
+                    self.nullable = False
                   
             elif self.symbol.label == "|":
                 self.leftChild.calculate_positions()

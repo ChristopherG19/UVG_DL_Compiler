@@ -4,8 +4,8 @@
 
 let delim = [' ''\t''\n']
 let ws = delim+
-let letter = ['A'-'Z''a'-'z']
-let digit = ['0'-'9']
+let letter = ['A'-'C''a'-'c']
+let digit = ['0'-'3']
 let id = letter(letter|digit)*
 
 rule tokens = 
