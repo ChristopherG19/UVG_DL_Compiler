@@ -63,10 +63,6 @@ ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
 print("Postfix: ", "".join(ls))
 print()
 
-# T = Tree(NPos)
-# T.generateTree()       
-# T.print_final_Tree(f"tree_yal{nameFile[-1]}")
-
 # print("-----  AFN (Thompson) -----")
 # nfaCons = Construction(word, postfixExp, alphabet)
 # nfa = nfaCons.Thompson_Construction()
@@ -121,5 +117,33 @@ showGraphDFA(dfaD, "Directo")
 
 # minDfaDSim = dfaSimulation(dfaMinD, cadena)
 # print(f"(D minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaDSim.Simulation()} es aceptada")
+
+# --------------------------------------------------------------
+# Mostrar arboles: Laboratorio C
+# --------------------------------------------------------------
+# nameFile = "slr-4"
+# yal = YalLector(f'./yalex-tests/{nameFile}.yal')
+# word = yal.read()
+
+# Obj = Conversion(word)
+# postfixExp = Obj.infixToPostfix()
+# alphabet = Obj.get_alphabet()
+# print("Alfabeto: ", alphabet)
+
+# newSim = Simbolo('#') 
+# newSim2 = Simbolo('.') 
+# newSim2.setType(True)
+# NPos = postfixExp.copy()
+# NPos.append(newSim)
+# NPos.append(newSim2)
+
+# print()
+# ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
+# print("Postfix: ", "".join(ls))
+# print()
+
+# T = Tree(NPos)
+# T.generateTree()       
+# T.print_final_Tree(f"tree_yal{nameFile[-1]}")
 
 print()
