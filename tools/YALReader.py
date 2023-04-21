@@ -66,16 +66,9 @@ class YalLector():
                     break
                 else:
                     er = leftSide.strip().split(" ")[0]
-                    if("rul" in er):
-                        Errors.append((None, leftSide, f"{er} no definido"))
-                        return(Errors, "")
-                    else:
-                        Errors.append((None, leftSide, f"{er} no definido"))
+                    Errors.append((None, leftSide, f"{er} no definido"))
             else:
-                if(type(split_line_temp) == str):
-                    Errors.append((None, split_line_temp, "Asignacion incorrecta"))
-                else:
-                    Errors.append((None, split_line_temp[0], "Asignacion incorrecta"))
+                Errors.append((None, split_line_temp[0], "Asignacion incorrecta"))
         
         # Definiciones
         print("Definiciones:")
@@ -151,7 +144,7 @@ class YalLector():
             ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.regexFinal]
             print("Regex final en infix:", "".join(ls))
 
-        return (Errors, self.regexFinal)
+        return self.regexFinal
 
     # Verificar si existen caracteres de escape
     def has_escape_characters(self, line):

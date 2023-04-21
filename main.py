@@ -44,39 +44,24 @@ from tools.YALReader import *
 
 nameFile = "slr-0"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
-Errors, word = yal.read()
+word = yal.read()
 
-if len(Errors) == 0:
-    Obj = Conversion(word)
-    postfixExp = Obj.infixToPostfix()
-    alphabet = Obj.get_alphabet()
-    print("Alfabeto: ", alphabet)
+Obj = Conversion(word)
+postfixExp = Obj.infixToPostfix()
+alphabet = Obj.get_alphabet()
+print("Alfabeto: ", alphabet)
 
-    newSim = Simbolo('#') 
-    newSim2 = Simbolo('.') 
-    newSim2.setType(True)
-    NPos = postfixExp.copy()
-    NPos.append(newSim)
-    NPos.append(newSim2)
+newSim = Simbolo('#') 
+newSim2 = Simbolo('.') 
+newSim2.setType(True)
+NPos = postfixExp.copy()
+NPos.append(newSim)
+NPos.append(newSim2)
 
-    print()
-    ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
-    print("Postfix: ", "".join(ls))
-    print()
-
-    print("-----  AFD (Directo)  -----")
-    T = directConstruction(word, postfixExp, alphabet)
-    dfaD = T.buildDFA()
-    print(dfaD)
-    print()
-
-    showGraphDFA(dfaD, "Directo")
-else:
-    print(f"\nEvaluacion Archivo YAL")
-    print("No es posible continuar por los siguientes errores: \n")
-    for err in Errors:
-        print(f"\tEn esta linea -> {err[1]}\n\t{err[2]}\n")
-        
+print()
+ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
+print("Postfix: ", "".join(ls))
+print()
 
 # print("-----  AFN (Thompson) -----")
 # nfaCons = Construction(word, postfixExp, alphabet)
@@ -94,13 +79,13 @@ else:
 
 # showGraphDFA(dfaS, "Subconjuntos")
 
-# print("-----  AFD (Directo)  -----")
-# T = directConstruction(word, postfixExp, alphabet)
-# dfaD = T.buildDFA()
-# print(dfaD)
-# print()
+print("-----  AFD (Directo)  -----")
+T = directConstruction(word, postfixExp, alphabet)
+dfaD = T.buildDFA()
+print(dfaD)
+print()
 
-# showGraphDFA(dfaD, "Directo")
+showGraphDFA(dfaD, "Directo")
 
 # print("-----  AFD Minimizado (Subconjuntos) -----")
 # miniS = Minimizador(dfaS, alphabet)
