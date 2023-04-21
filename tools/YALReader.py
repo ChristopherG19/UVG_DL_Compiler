@@ -51,20 +51,31 @@ class YalLector():
             NewLine = temp.strip()
             if NewLine:
                 lines_without_c.append(temp.strip())
+                
+        Errors = []
 
         for pos, cleanLine in enumerate(lines_without_c):
             split_line_temp = cleanLine.strip().split("=", 1)
             if len(split_line_temp) == 2:
                 leftSide, rightSide = (el.strip() for el in split_line_temp)
-                if(cleanLine.split("=")[0].strip().split(" ")[0] == "let"):
-                    self.definiciones.append(cleanLine)
-                elif(cleanLine.split("=")[0].strip().split(" ")[0] == "rule"):
+                if(leftSide.strip().split(" ")[0].lower() == "let"):
+                    self.definiciones.append(cleanLine.lower())
+                elif(leftSide.strip().split(" ")[0].lower() == "rule"):
                     for i in range(pos, len(lines_without_c)):
-                        self.rules.append(lines_without_c[i].strip())                     
+                        self.rules.append(lines_without_c[i].strip().lower())                     
                     break
                 else:
-                    print("\nArchivo YAL posee errores en las definiciones o rules\n")
-                    return "ERROR"
+                    er = leftSide.strip().split(" ")[0]
+                    if("rul" in er):
+                        Errors.append((None, leftSide, f"{er} no definido"))
+                        return(Errors, "")
+                    else:
+                        Errors.append((None, leftSide, f"{er} no definido"))
+            else:
+                if(type(split_line_temp) == str):
+                    Errors.append((None, split_line_temp, "Asignacion incorrecta"))
+                else:
+                    Errors.append((None, split_line_temp[0], "Asignacion incorrecta"))
         
         # Definiciones
         print("Definiciones:")
@@ -118,28 +129,29 @@ class YalLector():
                 
         print()
         # Limpieza de rules
-        self.rules.remove(self.rules[0])
-        
-        # Se obtiene la regex temporal sin procesar
-        self.tempRegex = self.get_rule_regex(self.rules)
+        if(self.rules != []):
+            self.rules.remove(self.rules[0])
+            
+            # Se obtiene la regex temporal sin procesar
+            self.tempRegex = self.get_rule_regex(self.rules)
 
-        print("Definiciones procesadas (completas)")
-        for definition in self.cleanDefiniciones:
-            print("-"*70)
-            print(definition.lintDesc())
-            print("-"*70)
+            print("Definiciones procesadas (completas)")
+            for definition in self.cleanDefiniciones:
+                print("-"*70)
+                print(definition.lintDesc())
+                print("-"*70)
+                print()
+
             print()
+            ls = [l.label for l in self.tempRegex]
+            print("Regex sin procesar:", "".join(ls))
+            print()
+            
+            self.regexFinal = self.get_final_regex()
+            ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.regexFinal]
+            print("Regex final en infix:", "".join(ls))
 
-        print()
-        ls = [l.label for l in self.tempRegex]
-        print("Regex sin procesar:", "".join(ls))
-        print()
-        
-        self.regexFinal = self.get_final_regex()
-        ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.regexFinal]
-        print("Regex final en infix:", "".join(ls))
-
-        return self.regexFinal
+        return (Errors, self.regexFinal)
 
     # Verificar si existen caracteres de escape
     def has_escape_characters(self, line):

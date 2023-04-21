@@ -45,7 +45,7 @@ class directConstruction():
                 numberFState = i[4]
                 
             #Imprimir árbol
-            # print(i)
+            print(i)
 
         # Se sigue el pseudocódigo proporcionado por el libro del dragón
         Dstates = []

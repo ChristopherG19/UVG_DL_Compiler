@@ -42,26 +42,41 @@ from tools.YALReader import *
 # word = '(a|b)*a(a|b)(a|b)'
 # cadena = 'aabc'
 
-nameFile = "slr-4"
+nameFile = "slr-0"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
-word = yal.read()
+Errors, word = yal.read()
 
-Obj = Conversion(word)
-postfixExp = Obj.infixToPostfix()
-alphabet = Obj.get_alphabet()
-print("Alfabeto: ", alphabet)
+if len(Errors) == 0:
+    Obj = Conversion(word)
+    postfixExp = Obj.infixToPostfix()
+    alphabet = Obj.get_alphabet()
+    print("Alfabeto: ", alphabet)
 
-newSim = Simbolo('#') 
-newSim2 = Simbolo('.') 
-newSim2.setType(True)
-NPos = postfixExp.copy()
-NPos.append(newSim)
-NPos.append(newSim2)
+    newSim = Simbolo('#') 
+    newSim2 = Simbolo('.') 
+    newSim2.setType(True)
+    NPos = postfixExp.copy()
+    NPos.append(newSim)
+    NPos.append(newSim2)
 
-print()
-ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
-print("Postfix: ", "".join(ls))
-print()
+    print()
+    ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
+    print("Postfix: ", "".join(ls))
+    print()
+
+    print("-----  AFD (Directo)  -----")
+    T = directConstruction(word, postfixExp, alphabet)
+    dfaD = T.buildDFA()
+    print(dfaD)
+    print()
+
+    showGraphDFA(dfaD, "Directo")
+else:
+    print(f"\nEvaluacion Archivo YAL")
+    print("No es posible continuar por los siguientes errores: \n")
+    for err in Errors:
+        print(f"\tEn esta linea -> {err[1]}\n\t{err[2]}\n")
+        
 
 # print("-----  AFN (Thompson) -----")
 # nfaCons = Construction(word, postfixExp, alphabet)
@@ -79,13 +94,13 @@ print()
 
 # showGraphDFA(dfaS, "Subconjuntos")
 
-print("-----  AFD (Directo)  -----")
-T = directConstruction(word, postfixExp, alphabet)
-dfaD = T.buildDFA()
-print(dfaD)
-print()
+# print("-----  AFD (Directo)  -----")
+# T = directConstruction(word, postfixExp, alphabet)
+# dfaD = T.buildDFA()
+# print(dfaD)
+# print()
 
-showGraphDFA(dfaD, "Directo")
+# showGraphDFA(dfaD, "Directo")
 
 # print("-----  AFD Minimizado (Subconjuntos) -----")
 # miniS = Minimizador(dfaS, alphabet)
