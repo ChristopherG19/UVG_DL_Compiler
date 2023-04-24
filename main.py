@@ -13,6 +13,7 @@ from simulation.dfaSimulation import *
 from automatas.construccionDirecta import *
 from automatas.minimizacion import *
 from tools.YALReader import *
+import pickle
  
 ''' Expresiones pruebas '''
 # word = '(a*|b*)c' 
@@ -44,11 +45,14 @@ from tools.YALReader import *
 
 nameFile = "slr-0"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
-word = yal.read()
+word, wordVerify = yal.read()
 
 Obj = Conversion(word)
+Obj2 = Conversion(wordVerify)
 postfixExp = Obj.infixToPostfix()
+postfixExpV2 = Obj2.infixToPostfix()
 alphabet = Obj.get_alphabet()
+alphabetV2 = Obj2.get_alphabet()
 print("Alfabeto: ", alphabet)
 
 newSim = Simbolo('#') 
@@ -63,60 +67,24 @@ ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
 print("Postfix: ", "".join(ls))
 print()
 
-# print("-----  AFN (Thompson) -----")
-# nfaCons = Construction(word, postfixExp, alphabet)
-# nfa = nfaCons.Thompson_Construction()
-# print(nfa)
-# print()
-
-# showGraphNFA(nfa, "Thompson")
-
-# print("-----  AFD (Subconjuntos) -----")
-# dfaSub = subconjuntos(nfa, alphabet, word, postfixExp)
-# dfaS = dfaSub.subconjuntos_construction()
-# print(dfaS)
-# print()
-
-# showGraphDFA(dfaS, "Subconjuntos")
-
 print("-----  AFD (Directo)  -----")
 T = directConstruction(word, postfixExp, alphabet)
 dfaD = T.buildDFA()
 print(dfaD)
 print()
-
+dfaD.alphabet = alphabet
 showGraphDFA(dfaD, "Directo")
 
-# print("-----  AFD Minimizado (Subconjuntos) -----")
-# miniS = Minimizador(dfaS, alphabet)
-# dfaMinS = miniS.minimize_afd()
-# print(dfaMinS)
-# print()
+print("-----  AFD (Directo_V2)  -----")
+T = directConstruction(wordVerify, postfixExpV2, alphabetV2)
+dfaD_V2 = T.buildDFA()
+print()
+dfaD_V2.alphabet = alphabet
+showGraphDFA(dfaD_V2, "Directo_V2")
 
-# showGraphDFA(dfaMinS, "Minimizado_Subconjuntos")
-
-# print("-----  AFD Minimizado (Directo) -----")
-# miniD = Minimizador(dfaD, alphabet)
-# dfaMinD = miniD.minimize_afd()
-# print(dfaMinD)
-# print()
-
-# showGraphDFA(dfaMinD, "Minimizado_Directo")
-
-# nfaS = nfaSimulation(nfa, cadena)
-# print(f"(Thompson) Cadena ingresada: {cadena} | Resultado: {nfaS.Simulation()} es aceptada")
-
-# dfaSSim = dfaSimulation(dfaS, cadena)
-# print(f"(Subconjuntos) Cadena ingresada: {cadena} | Resultado: {dfaSSim.Simulation()} es aceptada")
-
-# dfaDSim = dfaSimulation(dfaD, cadena)
-# print(f"(Directo) Cadena ingresada: {cadena} | Resultado: {dfaDSim.Simulation()} es aceptada")
-
-# minDfaSSim = dfaSimulation(dfaMinS, cadena)
-# print(f"(SC minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaSSim.Simulation()} es aceptada")
-
-# minDfaDSim = dfaSimulation(dfaMinD, cadena)
-# print(f"(D minimizado) Cadena ingresada: {cadena} | Resultado: {minDfaDSim.Simulation()} es aceptada")
+with open(f'./scanners/AFD_yal{nameFile[-1]}', 'wb') as f:
+    pickle.dump(dfaD, f)
+    pickle.dump(dfaD_V2, f)
 
 # --------------------------------------------------------------
 # Mostrar arboles: Laboratorio C

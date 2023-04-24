@@ -62,7 +62,7 @@ class YalLector():
                     self.definiciones.append(cleanLine.lower())
                 elif(leftSide.strip().split(" ")[0].lower() == "rule"):
                     for i in range(pos, len(lines_without_c)):
-                        self.rules.append(lines_without_c[i].strip().lower())                     
+                        self.rules.append(lines_without_c[i].strip())                     
                     break
                 else:
                     er = leftSide.strip().split(" ")[0]
@@ -126,8 +126,8 @@ class YalLector():
             self.rules.remove(self.rules[0])
             
             # Se obtiene la regex temporal sin procesar
-            self.tempRegex = self.get_rule_regex(self.rules)
-
+            self.tempRegex, self.tempRegexV2 = self.get_rule_regex(self.rules)
+            
             print("Definiciones procesadas (completas)")
             for definition in self.cleanDefiniciones:
                 print("-"*70)
@@ -140,11 +140,12 @@ class YalLector():
             print("Regex sin procesar:", "".join(ls))
             print()
             
-            self.regexFinal = self.get_final_regex()
+            self.regexFinal = self.get_final_regex(self.tempRegex)
+            self.regexFinalV2 = self.get_final_regex(self.tempRegexV2)
             ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.regexFinal]
             print("Regex final en infix:", "".join(ls))
 
-        return self.regexFinal
+        return (self.regexFinal, self.regexFinalV2)
 
     # Verificar si existen caracteres de escape
     def has_escape_characters(self, line):
@@ -384,7 +385,29 @@ class YalLector():
                     
         # Se elimina el último or que se agrega    
         regex_symbols = regex_symbols[:-1]
-        return regex_symbols
+        newRegex_symbols = []
+        
+        # Se agregan terminaciones a cada subarbol
+        for i, elem in enumerate(regex_symbols):
+            if elem.label != '|' or i == 0:
+                newRegex_symbols.append(elem)
+            else:
+                anterior = newRegex_symbols[i-1]
+                newSim = Simbolo('#'+anterior.label) 
+                newRegex_symbols.append(newSim)
+
+        if newRegex_symbols[-1].label != '|':
+            anterior = newRegex_symbols[-1]
+            newSim = Simbolo('#'+anterior.label) 
+            newRegex_symbols.append(newSim)
+        
+        finalRegexSymbols = []  
+        for i in range(len(newRegex_symbols)):
+            finalRegexSymbols.append(newRegex_symbols[i])
+            if (i+1) % 2 == 0 and i != len(newRegex_symbols)-1:
+                finalRegexSymbols.append(symS)
+                
+        return (regex_symbols, finalRegexSymbols)
 
     # Se determina si un token es o no un terminal
     def isTerminal(self, token):
@@ -408,6 +431,7 @@ class YalLector():
                 newRegex = self.bottom_Down(self.get_definition(tok), newRegex)
             else:
                 newSym = Simbolo(tok.label)
+                newSym.setToken(tok.token)
                 
                 if(tok.isSpecialChar):
                     newSym.setSpecialType(True)
@@ -420,8 +444,8 @@ class YalLector():
         return newRegex
 
     # Regex final con las sustituciones hechas
-    def get_final_regex(self):
-        final_regex = self.tempRegex
+    def get_final_regex(self, finalRegex):
+        final_regex = finalRegex
         newRegex = []
         Final = self.bottom_Down(final_regex, newRegex)
         return Final

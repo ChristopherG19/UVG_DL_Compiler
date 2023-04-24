@@ -1,9 +1,8 @@
-10 11 3.2E+15
+10 11 abc2a
+abcabacababcaba + 3.2E+15
 
-hol5a mundo
-
+ccc5a mundo )
 Frase prueba
-JULIO22D
+PALABRA22B
 
 22
-

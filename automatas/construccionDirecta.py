@@ -16,10 +16,16 @@ class directConstruction():
         self.alphabet = alphabet
         newSim = Simbolo('#') 
         newSim2 = Simbolo('.') 
+        newSim.setFinalSymbol(True)
         newSim2.setType(True)
         self.postfix.append(newSim)
         self.postfix.append(newSim2)
         self.letterSymbols = {}
+        
+        # print()
+        # for i in self.postfix:
+        #     print(i, i.isOperator, i.isSpecialChar, i.token, i.isFinalSymbol)
+        # print()
 
     def buildDFA(self):
         T = Tree(self.postfix)
@@ -32,6 +38,7 @@ class directConstruction():
         InState = None
         FnStates = []
         trans = []
+        tokensTrans = [None]
         numberFState = 1
         names = {}
         ABC = listAlphabet()
@@ -45,7 +52,7 @@ class directConstruction():
                 numberFState = i[4]
                 
             #Imprimir árbol
-            print(i)
+            #print(i)
 
         # Se sigue el pseudocódigo proporcionado por el libro del dragón
         Dstates = []
@@ -75,8 +82,18 @@ class directConstruction():
 
                     if(t != []):
                         if(U != []):
-                            trans.append(Transition(t, symbol, U))  
-                
+                            for el in FinalTree:
+                                if (el[0].label == symbol):
+                                    if (symbol == '#'):
+                                        if (el[0].token not in tokensTrans):
+                                            tokensTrans.append(el[0].token)
+                                            trans.append(Transition(t, el[0], U)) 
+                                            break 
+                                    else:
+                                        trans.append(Transition(t, el[0], U))
+                                        break
+                                    
+
         # Se renombran los estados
         for newState in Dstates_marked:
             if(newState != []):

@@ -10,12 +10,20 @@ class Simbolo():
         self.label = symbol
         self.isOperator = False
         self.isSpecialChar = False
+        self.token = None
+        self.isFinalSymbol = False
     
     def setType(self, isOperator):
         self.isOperator = isOperator
         
     def setSpecialType(self, isSpecial):
         self.isSpecialChar = isSpecial
+
+    def setToken(self, newToken):
+        self.token = newToken
+        
+    def setFinalSymbol(self, isFinal):
+        self.isFinalSymbol = isFinal
 
     def __str__(self):
         if(self.isSpecialChar):
@@ -102,4 +110,60 @@ def listAlphabet():
         new.append(i.upper())
     new.reverse()
     return new
-    
+
+def get_tokens_States(finalState, transitions):
+    tokens_States = {}
+    transFinales = []
+    for trans in transitions:
+        for fState in finalState:
+            if(trans.fnState == fState):
+                if trans not in transFinales:
+                    transFinales.append(trans)
+            
+    for trans in transFinales:
+        tokens_States[trans.inState] = trans.symbol.label.strip("#")
+
+    return tokens_States
+
+def get_final_States(finalStates, transitions):
+    final_States = {}
+    transFinales = []
+    for trans in transitions:
+        for fState in finalStates:
+            if(trans.fnState == fState):
+                if trans not in transFinales:
+                    transFinales.append(trans)
+                    
+    for trans in transFinales:
+        if (trans.fnState not in final_States):
+            final_States[trans.fnState] = [trans.symbol.label]
+        else:
+            if (trans.symbol.label not in final_States[trans.fnState]):
+                final_States[trans.fnState].append(trans.symbol.label)
+        
+    return final_States
+
+def get_final_States_tokens(finalStates, transitions):
+    new_finalStates = []
+    for trans in transitions:
+        for fState in finalStates:
+            if(trans.fnState == fState):
+                if trans.inState not in new_finalStates:
+                    new_finalStates.append(trans.inState)
+                    
+    final_States = {}
+    transFinales = []
+    for trans in transitions:
+        for fState in new_finalStates:
+            if(trans.fnState == fState):
+                if trans not in transFinales:
+                    transFinales.append(trans)
+                    
+    for trans in transFinales:
+        if (trans.fnState not in final_States):
+            final_States[trans.fnState] = [trans.symbol.label]
+        else:
+            if (trans.symbol.label not in final_States[trans.fnState]):
+                final_States[trans.fnState].append(trans.symbol.label)
+                    
+    return final_States

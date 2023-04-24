@@ -5,9 +5,9 @@
 
 	let delim = [' ''\t''\n']
  let ws = delim+ 
-let letter = ['A'-'C''a'-'c']
+let letter = ['A'-'Z''a'-'z']
 
-let digit = ['012']
+let digit = ['0123456789']
    let id = letter (letter | digit)*
 let equal = ["="]
 
@@ -25,5 +25,6 @@ rule tokens =
   	| '*'       { return TIMES }
   	| '('       { return LPAREN }
   	| ')'       { return RPAREN }
+	| '*)'      { return STARTCOMMENT }
 
 (* Introducir cualquier trailer aqui *)
