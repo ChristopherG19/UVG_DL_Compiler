@@ -43,7 +43,7 @@ import pickle
 # word = '(a|b)*a(a|b)(a|b)'
 # cadena = 'aabc'
 
-nameFile = "slr-2"
+nameFile = "slr-4"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
 word, wordVerify = yal.read()
 
@@ -75,10 +75,9 @@ print()
 dfaD.alphabet = alphabet
 showGraphDFA(dfaD, "Directo")
 
-print("-----  AFD (Directo_V2)  -----")
+#print("-----  AFD (Directo_V2)  -----")
 T = directConstruction(wordVerify, postfixExpV2, alphabetV2)
 dfaD_V2 = T.buildDFA()
-print()
 dfaD_V2.alphabet = alphabet
 showGraphDFA(dfaD_V2, "Directo_V2")
 

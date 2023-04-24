@@ -27,6 +27,7 @@ class ScannerGen():
         # print("\nDic Tokens V2", self.dicTokensV2)
 
         self.equivalent_states = {}
+        # Key: dictokensV2, Value: finalStates
         for key, value in self.finalStates.items():
             for key2, value2 in self.dicTokensV2.items():
                 if value == value2:
@@ -57,15 +58,24 @@ class ScannerGen():
                     return self.dicTokens[key]
                 else:
                     return self.dicTokens[key]
+            else:
+                for key, value in self.dicTokensV2.items():
+                    if value == self.finalStates[state]:
+                        return self.dicTokens[key]
         
     def print_listTokens(self, listTokens):
         for token in listTokens:
             if(token[1] == 'Error'):
                 print(f"-> {token[0]}: Error léxico")
             else:
-                print(f"-> {repr(token[0])}: {self.get_token(token[0], token[1][0])}")
+                temp = ""
+                if "\n" in token[0] or token[0] == " " or token[0] == "":
+                    temp = repr(token[0])
+                else:
+                    temp = token[0]
+                print(f"-> {temp}: {self.get_token(token[0], token[1][0])}")
         
-Scan = ScannerGen('scanners/AFD_yal2', 'yalex-tests/lectura.txt')
+Scan = ScannerGen('scanners/AFD_yal4', 'yalex-tests/lectura.txt')
 listToks = Scan.simulate()
 Scan.print_listTokens(listToks)
 print()

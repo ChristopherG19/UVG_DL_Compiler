@@ -121,7 +121,7 @@ class directConstruction():
             if numberFState in values:
                 FnStates.append(key)
                 
-        print(names)
+        #print(names)
         return AFD(InState, FnStates, len(names), final_Trans, list(names.keys()))
 
         
