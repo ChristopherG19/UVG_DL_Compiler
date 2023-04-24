@@ -22,16 +22,15 @@ class ScannerGen():
         with open(inputText) as f:
             self.text = f.readlines()
             
-        print("\nFinal_States: ", self.finalStates)
-        print("\nDic Tokens", self.dicTokens)
-        print("\nDic Tokens V2", self.dicTokensV2)
-    
-        print()
-        equivalent_states = {}
+        # print("\nFinal_States: ", self.finalStates)
+        # print("\nDic Tokens", self.dicTokens)
+        # print("\nDic Tokens V2", self.dicTokensV2)
+
+        self.equivalent_states = {}
         for key, value in self.finalStates.items():
             for key2, value2 in self.dicTokensV2.items():
                 if value == value2:
-                    equivalent_states[key2] = [key]
+                    self.equivalent_states[key2] = [key]
                 else:
                     ts = True
                     for val in value2:
@@ -39,21 +38,34 @@ class ScannerGen():
                             ts = False
                         
                     if ts:
-                        equivalent_states[key2] = [key]
-                    
-        print(equivalent_states)
-        print()
-                    
-        prueba = 'C'
-        simbolo = '*)'
-        for key, value in equivalent_states.items():
-            if prueba in value:
-                if simbolo == self.dicTokens[key]:
-                    print(self.dicTokens[key])
+                        self.equivalent_states[key2] = [key]
+        
+        # print("\nEquivalent Tokens", self.equivalent_states)
     
     def simulate(self):
         a = dfaSimulation(self.dfaD)
-        a.SimulationTokens(self.text)
+        return a.SimulationTokens(self.text)
     
-a = ScannerGen('scanners/AFD_yal0', 'yalex-tests/lectura.txt')
-a.simulate()
+    def get_token(self, symbol, state):
+        for key, value in self.equivalent_states.items():
+            if state in value:
+                for key2,value2 in self.dicTokens.items():
+                    if symbol == value2:
+                        return self.dicTokens[key2]
+
+                if symbol == self.dicTokens[key]:
+                    return self.dicTokens[key]
+                else:
+                    return self.dicTokens[key]
+        
+    def print_listTokens(self, listTokens):
+        for token in listTokens:
+            if(token[1] == 'Error'):
+                print(f"-> {token[0]}: Error léxico")
+            else:
+                print(f"-> {repr(token[0])}: {self.get_token(token[0], token[1][0])}")
+        
+Scan = ScannerGen('scanners/AFD_yal2', 'yalex-tests/lectura.txt')
+listToks = Scan.simulate()
+Scan.print_listTokens(listToks)
+print()

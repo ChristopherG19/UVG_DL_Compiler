@@ -68,50 +68,31 @@ class dfaSimulation():
                                 temp = ""
                     else:
                         if (i+1 < len(text)):
-                            print(i, j, len(text), len(text[i]))
-                            try:
-                                NewActualState = self.move(ActualState, text[i+1][j+1])
-                                if not NewActualState:
-                                    coins.append((temp, ActualState))
-                                    ActualState = self.AFD.initialState
-                                    temp = ""
-                                else:
-                                    NewActualState = self.move(NewActualState, text[i][j+1])
+                            for j in range(len(text[i+1])):
+                                if (j+1 < len(text[i+1])):
+                                    NewActualState = self.move(ActualState, text[i+1][j+1])
                                     if not NewActualState:
+                                        coins.append((temp, ActualState))
+                                        ActualState = self.AFD.initialState
                                         temp = ""
-                            except:
-                                0
-                                #print("Error: ",i, j, len(text), len(text[i]))
+                                    else:
+                                        NewActualState = self.move(NewActualState, text[i][j+1])
+                                        if not NewActualState:
+                                            temp = ""
+                                    break
                 else:
-                    ActualState = self.AFD.initialState
                     #print("No", repr(temp))
+                    ActualState = self.AFD.initialState
                     if (j+1 < len(text[i])):
                         NewActualState = self.move(ActualState, text[i][j+1])
                         if NewActualState:
+                            coins.append((temp, "Error"))
                             temp = ""
                             NewActualState = self.move(NewActualState, text[i][j+1])
                             if NewActualState:
                                 ActualState = self.AFD.initialState
-                                
-                # if ActualState == []:
-                #     ActualState = self.AFD.initialState
-                #     print("No", repr(temp))
-                #     if (i+1 < len(line)):
-                #         NewActualState = self.move(ActualState, line[i+1])
-                #         if NewActualState:
-                #             temp = ""
-                #             ActualState = self.AFD.initialState
-                #         # ActualState = self.AFD.initialState # Si se agrega aquí funciona más o menos, es raro
-                # else:
-                #     print("\nSi", repr(temp), ActualState)
-                #     print()
-                #     if (i+1 < len(line)):
-                #         NewActualState = self.move(ActualState, line[i+1])
-                #         if NewActualState == []:
-                #             coins.append(temp)
-                #             temp = ""
-                            
-        print(coins)             
+                   
+        return coins           
                              
 """
 def SimulationTokens(self, text):

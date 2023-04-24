@@ -1,6 +1,6 @@
 10 11 abc2a
 abcabacababcaba + 3.2E+15
-
+*) () 5
 ccc5a mundo )
 Frase prueba
 PALABRA22B

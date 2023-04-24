@@ -59,7 +59,7 @@ class YalLector():
             if len(split_line_temp) == 2:
                 leftSide, rightSide = (el.strip() for el in split_line_temp)
                 if(leftSide.strip().split(" ")[0].lower() == "let"):
-                    self.definiciones.append(cleanLine.lower())
+                    self.definiciones.append(cleanLine)
                 elif(leftSide.strip().split(" ")[0].lower() == "rule"):
                     for i in range(pos, len(lines_without_c)):
                         self.rules.append(lines_without_c[i].strip())                     
