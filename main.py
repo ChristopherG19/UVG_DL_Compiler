@@ -43,7 +43,7 @@ import pickle
 # word = '(a|b)*a(a|b)(a|b)'
 # cadena = 'aabc'
 
-nameFile = "slr-4"
+nameFile = "slr-3"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
 word, wordVerify, definitions = yal.read()
 
@@ -81,7 +81,7 @@ dfaD_V2 = T.buildDFA()
 dfaD_V2.alphabet = alphabet
 showGraphDFA(dfaD_V2, "Directo_V2")
 
-with open(f'./scanners/AFD_yal{nameFile[-1]}', 'wb') as f:
+with open(f'./scanners_dfa/AFD_yal{nameFile[-1]}', 'wb') as f:
     pickle.dump(dfaD, f)
     pickle.dump(dfaD_V2, f)
     pickle.dump(definitions, f)

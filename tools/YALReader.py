@@ -362,9 +362,7 @@ class YalLector():
         # Se obtienen los tokens para la regex y se guarda la descripción
         for el in listTokensDef:
             name, func = el
-            if name == ":=":
-                name = "→" 
-                
+            
             # Se agrega a la lista del regex
             regex_list.append(name.strip())
             
