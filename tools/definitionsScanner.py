@@ -6,13 +6,13 @@
 
 ID = 'ABC'
 NUMBER = 12
-SEMICOLON = ';'
-ASSIGNOP = ':='
+SEMICOLON = 'SEMI'
+ASSIGNOP = 'ASIG'
 LT = '<'
 EQ = '='
 PLUS = '+'
 MINUS = '-'
-TIMES = '*'
+TIMES = '* times'
 DIV = '/'
 LPAREN = '('
 RPAREN = ')'

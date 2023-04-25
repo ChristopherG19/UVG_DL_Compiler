@@ -43,7 +43,7 @@ import pickle
 # word = '(a|b)*a(a|b)(a|b)'
 # cadena = 'aabc'
 
-nameFile = "slr-3"
+nameFile = "slr-0"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
 word, wordVerify, definitions = yal.read()
 

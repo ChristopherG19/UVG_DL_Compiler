@@ -22,7 +22,7 @@ class ScannerGen():
         for definition in self.definiciones:
             self.cleanDefinitions.append(definition.Create_CleanDefinition())
 
-        print(self.cleanDefinitions)
+        # print(self.cleanDefinitions)
 
         self.finalStates = get_final_States(self.dfaD.finalStates, self.dfaD.transitions)
         self.dicTokens = get_tokens_States(self.dfaVerify.finalStates, self.dfaVerify.transitions)
@@ -75,20 +75,20 @@ class ScannerGen():
     def print_listTokens(self, listTokens):
         for token in listTokens:
             if(token[1] == 'Error'):
-                print(f"-> {token[0]}: Error léxico")
+                print(f"-> Valor: {token[0]} | Token: Error léxico")
             else:
                 temp = ""
                 if "\n" in token[0] or token[0] == " " or token[0] == "":
                     temp = repr(token[0])
                 else:
                     temp = token[0]
-                print(f"-> {temp}: {self.get_token(token[0], token[1][0])}")
+                print(f"-> Valor: {temp} | Token: {self.get_token(token[0], token[1][0])}")
         
     def get_new_list_tokens(self, listTokens):
         self.newListTokens = []
         for token in listTokens:
             if(token[1] == 'Error'):
-                self.newListTokens.append((token[0], "Error léxico"))
+                self.newListTokens.append((token[0], "Error"))
             else:
                 self.newListTokens.append((token[0], self.get_token(token[0], token[1][0])))
 
@@ -110,7 +110,6 @@ class ScannerGen():
                 i += 1
         return cadena.strip()
     
-    
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
         llave_cerrada = texto.rfind("}")
@@ -119,26 +118,50 @@ class ScannerGen():
         else:
             return None
     
-    def build_scanner(self):
-        self.scanner_file = f"scanners/scanner_yal{self.name[-1]}.py"
+    def build_scanner(self, name):
+        self.scanner_file = f"scanner_yal{self.name[-1]}.py"
         with open(self.scanner_file, "w") as f:
+            f.write("# -*- coding: utf-8 -*-\n")
             f.write("# Universidad del Valle de Guatemala\n")
             f.write("# Facultad de Ingenieria\n")
             f.write("# Departamento de Ciencias de la Computacion\n")
             f.write("# Diseno de lenguajes\n")
             f.write("# Christopher Garcia 20541\n")
             
-            f.write("\nfrom tools.definitionsScanner import *\n\n")
+            f.write("\nimport pickle\n")
+            f.write("from tools.definitionsScanner import *\n\n")
+            f.write("tokens = []\n")
+            f.write(f"with open('tokens/tokens_{name}', 'rb') as f:\n")
+            f.write("\ttokens = pickle.load(f)\n\n")
             f.write("def tokens_returns(symbol):\n")
             for element in self.cleanDefinitions:
                 if(element[2] != 'Sin funcion'):
                     func = self.get_brackets_info(element[2])
                     f.write(f"\tif symbol == '{element[0]}':\n\t\t{func}\n")
-                        
-Scan = ScannerGen('scanners_dfa/AFD_yal3', 'yalex-tests/lectura.txt')
+                    
+            f.write("\n\treturn symbol\n")
+            
+            f.write("\nfor token in tokens:\n")
+            f.write("\tif(token[1] == 'Error'):\n")
+            f.write("\t\tprint(f'-> Valor: {token[0]} | Token: Error lexico')\n")
+            f.write("\telse:\n")
+            f.write("\t\ttemp = ''\n")
+            f.write("\t\tif '\\n' in token[0] or token[0] == ' ' or token[0] == '':\n")
+            f.write("\t\t\ttemp = repr(token[0])\n")
+            f.write("\t\telse:\n")
+            f.write("\t\t\ttemp = token[0]\n")
+            f.write("\t\tprint(f'-> Valor: {temp} | Token: {tokens_returns(token[1])}')\n")
+            f.write("\n\n")
+            
+name = 'yal4'     
+Scan = ScannerGen(f'scanners_dfa/AFD_{name}', 'yalex-tests/lectura.txt')
 listToks = Scan.simulate()
+print("Lectura de archivo y obtención de tokens\n")
 Scan.print_listTokens(listToks)
-Scan.get_new_list_tokens(listToks)
+
+tokenList = Scan.get_new_list_tokens(listToks)
+with open(f'tokens/tokens_{name}', 'wb') as f:
+    pickle.dump(tokenList, f)
+    
 print()
-Scan.build_scanner()
-print()
+Scan.build_scanner(name)
