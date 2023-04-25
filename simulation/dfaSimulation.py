@@ -45,6 +45,7 @@ class dfaSimulation():
             
         return "No"
     
+    # Lectura archivo y look ahead
     def SimulationTokens(self, text):
         print()
         ActualState = self.AFD.initialState
@@ -93,44 +94,3 @@ class dfaSimulation():
                                 ActualState = self.AFD.initialState
                    
         return coins           
-                             
-"""
-def SimulationTokens(self, text):
-        print()
-        ActualState = self.AFD.initialState[0]
-        coincidencias = []
-        temp = ""
-        for line in text:
-            for i in range(len(line)): 
-                next, notTrans = True, True
-                char = line[i]
-                print(repr(temp))
-                while(next):
-                    for trans in self.AFD.transitions:
-                        if(trans.inState == ActualState and trans.symbol.label == char):
-                            temp += line[i]
-                            ActualState = trans.fnState
-                            next, notTrans = False, False
-                            break
-                        
-                    if notTrans:
-                        if (ActualState == self.AFD.initialState[0]):
-                            print("Error lexico", line[i])
-                            temp = ""
-                            next = False
-                        else:
-                            print("Token?", temp)
-                            temp = ""
-                            ActualState = self.AFD.initialState[0]
-            if temp:
-                if (ActualState == self.AFD.initialState[0]):
-                    print("Error lexico", line[i])
-                    temp = ""
-                else:
-                    print("Token?", temp)
-                    temp = ""
-                    ActualState = self.AFD.initialState[0]
-                        
-                
-        print(coincidencias)
-"""
