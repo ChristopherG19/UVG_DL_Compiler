@@ -45,7 +45,7 @@ import pickle
 
 nameFile = "slr-4"
 yal = YalLector(f'./yalex-tests/{nameFile}.yal')
-word, wordVerify = yal.read()
+word, wordVerify, definitions = yal.read()
 
 Obj = Conversion(word)
 Obj2 = Conversion(wordVerify)
@@ -84,6 +84,7 @@ showGraphDFA(dfaD_V2, "Directo_V2")
 with open(f'./scanners/AFD_yal{nameFile[-1]}', 'wb') as f:
     pickle.dump(dfaD, f)
     pickle.dump(dfaD_V2, f)
+    pickle.dump(definitions, f)
 
 # --------------------------------------------------------------
 # Mostrar arboles: Laboratorio C

@@ -97,6 +97,27 @@ class Definition():
         
         return f"\t-> Token: {self.name}\n\t   Desc: {valDesc}\n\t   Funcion: {valFunc}"
     
+    def Create_CleanDefinition(self):
+        if self.desc == None:
+            valDesc = "Sin descripcion" 
+        else:
+            if any(s.isSpecialChar == True for s in self.desc):
+                tempLD = []
+                for i in self.desc:
+                    if i.isSpecialChar:
+                        tempLD.append(repr(i.label).replace("'", ""))
+                    else:
+                        tempLD.append(i.label.replace("'", ""))
+                valDesc = ''.join(tempLD)
+            else:
+                tempLD = [s.label for s in self.desc]
+                valDesc = ''.join(tempLD)
+        
+        #valDesc2 = "Sin Desc" if self.desc is None else self.desc
+        valFunc = "Sin funcion" if self.func is None else self.func
+        
+        return (self.name, valDesc, valFunc)
+    
     def __eq__(self, other):
         if isinstance(other, Definition):
             return self.name == other.name

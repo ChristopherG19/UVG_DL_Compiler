@@ -5,6 +5,7 @@
 # Christopher García 20541
 
 import pickle
+import os
 from simulation.dfaSimulation import *
 from tools.components import get_tokens_States, get_final_States, get_final_States_tokens
 
@@ -13,7 +14,12 @@ class ScannerGen():
         with open(nameFile, 'rb') as f:
             self.dfaD = pickle.load(f)
             self.dfaVerify = pickle.load(f)
+            self.definiciones = pickle.load(f)
         f.close()
+
+        self.cleanDefinitions = [] 
+        for definition in self.definiciones:
+            self.cleanDefinitions.append(definition.Create_CleanDefinition())
 
         self.finalStates = get_final_States(self.dfaD.finalStates, self.dfaD.transitions)
         self.dicTokens = get_tokens_States(self.dfaVerify.finalStates, self.dfaVerify.transitions)
@@ -75,7 +81,22 @@ class ScannerGen():
                     temp = token[0]
                 print(f"-> {temp}: {self.get_token(token[0], token[1][0])}")
         
+    def get_new_list_tokens(self, listTokens):
+        self.newListTokens = []
+        for token in listTokens:
+            if(token[1] == 'Error'):
+                self.newListTokens.append((token[0], "Error léxico"))
+            else:
+                self.newListTokens.append((token[0], self.get_token(token[0], token[1][0])))
+
+        return self.newListTokens
+    
+    def build_scanner(self):
+        0
+     
+    
 Scan = ScannerGen('scanners/AFD_yal4', 'yalex-tests/lectura.txt')
 listToks = Scan.simulate()
 Scan.print_listTokens(listToks)
+Scan.get_new_list_tokens(listToks)
 print()

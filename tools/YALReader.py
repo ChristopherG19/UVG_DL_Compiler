@@ -145,7 +145,7 @@ class YalLector():
             ls = [l.label if not l.isSpecialChar else repr(l.label) for l in self.regexFinal]
             print("Regex final en infix:", "".join(ls))
 
-        return (self.regexFinal, self.regexFinalV2)
+        return (self.regexFinal, self.regexFinalV2, self.cleanDefiniciones)
 
     # Verificar si existen caracteres de escape
     def has_escape_characters(self, line):
