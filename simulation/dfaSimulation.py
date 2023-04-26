@@ -46,7 +46,7 @@ class dfaSimulation():
         return "No"
     
     # Lectura archivo y look ahead
-    def SimulationTokens(self, text):
+    def SimulationTokens(self, text, cleanDefs, equivalentTokens):
         print()
         ActualState = self.AFD.initialState
         temp = ""
@@ -60,7 +60,14 @@ class dfaSimulation():
                     if (j+1 < len(text[i])):
                         NewActualState = self.move(ActualState, text[i][j+1])
                         if not NewActualState:
-                            coins.append((temp, ActualState))
+                            newAS = self.move(self.AFD.initialState, temp)
+                            if newAS:
+                                if (newAS == ActualState):
+                                    coins.append((temp, ActualState))
+                                else:
+                                    coins.append((temp, newAS))
+                            else:
+                                coins.append((temp, ActualState))
                             ActualState = self.AFD.initialState
                             temp = ""
                         else:

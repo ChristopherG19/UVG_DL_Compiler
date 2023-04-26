@@ -54,7 +54,7 @@ class ScannerGen():
     
     def simulate(self):
         a = dfaSimulation(self.dfaD)
-        return a.SimulationTokens(self.text)
+        return a.SimulationTokens(self.text, self.dicTokensV2, self.equivalent_states)
     
     def get_token(self, symbol, state):
         for key, value in self.equivalent_states.items():
@@ -69,7 +69,7 @@ class ScannerGen():
                     return self.dicTokens[key]
             else:
                 for key, value in self.dicTokensV2.items():
-                    if value == self.finalStates[state]:
+                    if value == self.finalStates[state] or value in self.finalStates[state]:
                         return self.dicTokens[key]
         
     def print_listTokens(self, listTokens):
@@ -82,7 +82,7 @@ class ScannerGen():
                     temp = repr(token[0])
                 else:
                     temp = token[0]
-                print(f"-> Valor: {temp} | Token: {self.get_token(token[0], token[1][0])}")
+                print(f"-> Valor: {temp} | Token: {self.get_token(temp, token[1][0])}")
         
     def get_new_list_tokens(self, listTokens):
         self.newListTokens = []
@@ -153,7 +153,7 @@ class ScannerGen():
             f.write("\t\tprint(f'-> Valor: {temp} | Token: {tokens_returns(token[1])}')\n")
             f.write("\n\n")
             
-name = 'yal4'     
+name = 'yal0'     
 Scan = ScannerGen(f'scanners_dfa/AFD_{name}', 'yalex-tests/lectura.txt')
 listToks = Scan.simulate()
 print("Lectura de archivo y obtención de tokens\n")
