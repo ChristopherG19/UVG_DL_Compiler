@@ -89,7 +89,6 @@ class dfaSimulation():
                                             temp = ""
                                     break
                 else:
-                    #print("No", repr(temp))
                     ActualState = self.AFD.initialState
                     if (j+1 < len(text[i])):
                         NewActualState = self.move(ActualState, text[i][j+1])
@@ -99,5 +98,7 @@ class dfaSimulation():
                             NewActualState = self.move(NewActualState, text[i][j+1])
                             if NewActualState:
                                 ActualState = self.AFD.initialState
+                    else:
+                        coins.append((temp, "Error"))
                    
         return coins           
