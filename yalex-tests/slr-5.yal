@@ -1,0 +1,24 @@
+let delim = [' ''\t''\n']
+let characters = ['+''*''-''/']
+let ws = delim+
+let letterMayus = ['A'-'Z']
+let letterMinus = ['a'-'z']
+let minusword = letterMinus*
+let mayusword = letterMayus*
+
+
+rule tokens =
+    ws        { return WHITESPACE }
+  | characters { return CHARACTERS }
+  | "/*"      { return LEFTCOMMENT }
+  | "→"      { return ARROW }
+  | "*/"      { return RIGHTCOMMENT }
+  | "%token"  { return TOKEN }
+  | '|'       { return OR }
+  | "IGNORE"  { return IGNORE }
+  | minusword { return WORDMIN }
+  | mayusword { return WORDMAY }
+  | "%%"      { return SPLIT }  
+  | ":"       { return TWOPOINTS }
+  | ";"       { return FINISHDECLARATION }
+  

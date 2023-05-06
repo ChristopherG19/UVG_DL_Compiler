@@ -290,6 +290,11 @@ class YalLector():
                 if elem == '_':
                     sym = Simbolo(elem)
                     newDesc.append(sym)
+                    
+                if elem == '→':
+                    print("Holaaaaaaaaaaa", ord(elem))
+                    sym = Simbolo(ord(elem))
+                    newDesc.append(sym)
         
                 if char == '[':
                     in_cor = True
@@ -339,26 +344,50 @@ class YalLector():
         regex_symbols = []
         symS = Simbolo('|')
         symS.setType(True)
-        
-        tempL = ""
+        tempRules = []
+
         for line in rules:
             # Eliminar comillas y espacios en blanco
             line = line.replace("'", '')
             line = line.replace('"', '')
     
             line = line.strip()
-                
-            tempL += line + " "
-        
+            if(line[0] == '|'):
+                tempRules.append(symS)
+                tempRules.append(line[1:])
+            else:
+                tempRules.append(line)
+
+        ListRules = []
+        tempLi = []
+        tempEl = ""
+        for element in tempRules:
+            if(element == tempRules[-1]):
+                ListRules.append([element.strip()])
+            if type(element) == Simbolo and element.label == '|' and element.isOperator:
+                tempLi.append(tempEl)
+                ListRules.append(tempLi)
+                ListRules.append(element)
+                tempLi = []
+                tempEl = ""
+            else:
+                tempEl += element.strip()+" "
+            
         # Se limpian espacios extra
         listTokensDef = []
-        for TokenDef in tempL.split("|"):
-            parts = TokenDef.strip().split(" ", 1)  
-            if len(parts) == 1:
-                listTokensDef.append([parts[0].strip(), None])
+        for TokenDef in ListRules:
+            if type(TokenDef) == Simbolo and TokenDef.label == '|' and TokenDef.isOperator:
+                continue
             else:
-                listTokensDef.append([parts[0].strip(), parts[1].strip()])
-            
+                parts = TokenDef[0].strip().split(" ", 1)  
+                if len(parts) == 1:
+                    listTokensDef.append([parts[0].strip(), None])
+                else:
+                    if(parts[0].strip() == 'â†’'):
+                        listTokensDef.append(['\u2192', parts[1].strip()])
+                    else:
+                        listTokensDef.append([parts[0].strip(), parts[1].strip()])
+
         # Se obtienen los tokens para la regex y se guarda la descripción
         for el in listTokensDef:
             name, func = el

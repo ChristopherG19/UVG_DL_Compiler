@@ -46,13 +46,13 @@ class dfaSimulation():
         return "No"
     
     # Lectura archivo y look ahead
-    def SimulationTokens(self, text, cleanDefs, equivalentTokens):
+    def SimulationTokens(self, text):
         print()
         ActualState = self.AFD.initialState
         temp = ""
         coins = []
         for i in range(len(text)):
-            for j in range(len(text[i])):         
+            for j in range(len(text[i])):   
                 temp += text[i][j]       
                 ActualState = self.move(ActualState, text[i][j])
                 if ActualState:

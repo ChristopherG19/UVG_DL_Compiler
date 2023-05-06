@@ -28,9 +28,9 @@ class ScannerGen():
         self.dicTokens = get_tokens_States(self.dfaVerify.finalStates, self.dfaVerify.transitions)
         self.dicTokensV2 = get_final_States_tokens(self.dfaVerify.finalStates, self.dfaVerify.transitions)
         
-        with open(inputText) as f:
+        with open(inputText, encoding='utf-8') as f:
             self.text = f.readlines()
-            
+
         # print("\nFinal_States: ", self.finalStates)
         # print("\nDic Tokens", self.dicTokens)
         # print("\nDic Tokens V2", self.dicTokensV2)
@@ -54,7 +54,7 @@ class ScannerGen():
     
     def simulate(self):
         a = dfaSimulation(self.dfaD)
-        return a.SimulationTokens(self.text, self.dicTokensV2, self.equivalent_states)
+        return a.SimulationTokens(self.text)
     
     def get_token(self, symbol, state):
         for key, value in self.equivalent_states.items():
@@ -120,7 +120,7 @@ class ScannerGen():
     
     def build_scanner(self, name):
         self.scanner_file = f"scanner_yal{self.name[-1]}.py"
-        with open(self.scanner_file, "w") as f:
+        with open(self.scanner_file, "w", encoding="utf-8") as f:
             f.write("# -*- coding: utf-8 -*-\n")
             f.write("# Universidad del Valle de Guatemala\n")
             f.write("# Facultad de Ingenieria\n")
@@ -154,7 +154,7 @@ class ScannerGen():
             f.write("\n\n")
             
 name = 'yal0'     
-Scan = ScannerGen(f'scanners_dfa/AFD_{name}', 'yalex-tests/lectura.txt')
+Scan = ScannerGen(f'scanners_dfa/AFD_{name}', './yalp-tests/slr-1.yalp')
 listToks = Scan.simulate()
 print("Lectura de archivo y obtención de tokens\n")
 Scan.print_listTokens(listToks)
