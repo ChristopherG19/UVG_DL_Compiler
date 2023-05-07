@@ -204,7 +204,6 @@ class YalLector():
             else:
                 sym = Simbolo(chr(code)) 
                 sym.setSpecialType(True)
-                sym.setSpecialType(True)
                 regexAscii.append(sym)
                 regexAscii.append(symS)
         
@@ -292,7 +291,6 @@ class YalLector():
                     newDesc.append(sym)
                     
                 if elem == '→':
-                    print("Holaaaaaaaaaaa", ord(elem))
                     sym = Simbolo(ord(elem))
                     newDesc.append(sym)
         
@@ -416,7 +414,7 @@ class YalLector():
         
         # Se agregan terminaciones a cada subarbol
         for i, elem in enumerate(regex_symbols):
-            if elem.label != '|' or i == 0:
+            if (not elem.isOperator) or i == 0:
                 newRegex_symbols.append(elem)
             else:
                 anterior = newRegex_symbols[i-1]

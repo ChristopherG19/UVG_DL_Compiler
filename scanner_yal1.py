@@ -13,6 +13,16 @@ with open('tokens/tokens_yal1', 'rb') as f:
 	tokens = pickle.load(f)
 
 def tokens_returns(symbol):
+	if symbol == 'id':
+		return ID
+	if symbol == '+':
+		return PLUS
+	if symbol == '*':
+		return TIMES
+	if symbol == '(':
+		return LPAREN
+	if symbol == ')':
+		return RPAREN
 
 	return symbol
 

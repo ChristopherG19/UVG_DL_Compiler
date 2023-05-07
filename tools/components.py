@@ -24,7 +24,7 @@ class Simbolo():
         
     def setFinalSymbol(self, isFinal):
         self.isFinalSymbol = isFinal
-
+    
     def __str__(self):
         if(self.isSpecialChar):
             return repr(self.label).replace("'", "")
@@ -45,6 +45,41 @@ class Estado():
     
     def __repr__(self):
         return str(self)
+    
+class ProductionItem():
+    def __init__(self, label, completeLabel=None):
+        self.label = label
+        self.info = completeLabel
+        self.terminal = False
+        self.dot = False
+        
+    def setType(self, isTerminal):
+        self.terminal = isTerminal
+        
+    def setFinal(self, isDot):
+        self.dot = isDot
+    
+    def __str__(self):
+        return f"{self.label}"
+    
+    def __repr__(self):
+        return str(self)
+    
+class Production():
+    def __init__(self, leftSide, rightSide):
+        self.ls = leftSide
+        self.rs = rightSide
+    
+    def getPosPoint(self):
+        point = ProductionItem('°')
+        point.setPointType(True)
+        return self.rs.index(point.label)
+    
+    def __str__(self) -> str:
+        return f"{self.ls} → {self.rs}"
+    
+    def first(self):
+        0
 
 # Clase Transición: Representa las transiciones del autómata
 class Transition():
