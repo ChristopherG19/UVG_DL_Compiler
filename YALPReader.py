@@ -13,6 +13,7 @@ class YalpLector():
         self.file = file
         self.tokensYalp = []
         self.grammar = []
+        self.grammarSymbols = []
         self.productions = []
         self.finalLines = []
     
@@ -65,16 +66,16 @@ class YalpLector():
                 self.finalLines.append(temp.strip())  
                 
         tokensYa = []
-        tokenBrackets = {}
+        self.tokenBrackets = {}
         for i in self.tokensY:
             a = i.Create_CleanDefinition()
             if a[2] != 'Sin funcion':
                 valueBrackets = self.getTokensYal(self.get_brackets_info(a[2]))
                 tokensYa.append(valueBrackets)
-                if (a[0] not in tokenBrackets):
-                    tokenBrackets[valueBrackets] = a[0]
+                if (a[0] not in self.tokenBrackets):
+                    self.tokenBrackets[valueBrackets] = a[0]
             else:
-                tokenBrackets[a[0].upper()] = None
+                self.tokenBrackets[a[0].upper()] = None
                     
         productionsLines = self.tokens(tokensYa)
         production = []
@@ -88,7 +89,7 @@ class YalpLector():
         print("------ Gramatica ------") 
         for i in self.grammar:
             print(i)
-            
+               
         print("\n------ Tokens Yalp ------")
         for i in self.tokensYalp:
             print(i)
@@ -122,9 +123,11 @@ class YalpLector():
                 else:
                     tempNewProduction.append(elem)
             newProductions.append(" ".join(tempNewProduction))
-        
+
         print()
-        ProductionsFinal = []
+        self.ProductionsFinal = []
+        dotItem = ProductionItem('°')
+        dotItem.setFinal(True)
         for element in newProductions:
             arrow = "→"
             if ("->" in element):
@@ -140,7 +143,7 @@ class YalpLector():
                 listProd = []
                 for elem in prod.split(" "):
                     if(elem.isupper()):
-                        newItem = ProductionItem(elem, tokenBrackets[elem])
+                        newItem = ProductionItem(elem, self.tokenBrackets[elem])
                         newItem.setType(True)
                         listProd.append(newItem)
                     else:
@@ -153,21 +156,86 @@ class YalpLector():
             for rightS in listRight: 
                 newT = ProductionItem(sides[0].strip()[0], sides[0].strip().lower())
                 newT.setType(False)
-                ProductionsFinal.append(Production(newT, rightS))
+                self.ProductionsFinal.append(Production(newT, rightS))
                 
-        dotItem = ProductionItem('°')
-        dotItem.setFinal(True)
+        #print(self.ProductionsFinal)
+                
         Aumentada = self.productions[0][0]
         newItem = ProductionItem(Aumentada)
         newItemB = ProductionItem(f"{Aumentada}'")
-        newProd = Production(newItemB, [dotItem, newItem])
-        ProductionsFinal.insert(0, newProd)        
+        newProdAumentada = Production(newItemB, [dotItem, newItem])
+        self.ProductionsFinal.insert(0, newProdAumentada)        
         
-        
-        for x in ProductionsFinal:
-            print(x)
+        finalStates = self.get_Final_States(newProdAumentada)
+        # for x in self.ProductionsFinal:
+        #     print(x)
         
         print()
+        
+    def get_gramatical_symbols(self):
+        self.gramaticaSymbol = set()
+        for i in self.grammar:
+            for j in i.split(" "):
+                if j != ' ' and j != '' and j != '|' and j != '->' and j != '→':
+                    if(j.isalnum()):
+                        self.gramaticaSymbol.add(j.upper())
+                    else:
+                        self.gramaticaSymbol.add(j)
+                    
+        self.grammarSymbols = list(self.gramaticaSymbol)
+                    
+    def closure(self, productions):
+        dotItem = ProductionItem('°')
+        dotItem.setFinal(True)
+        J = productions
+        for prod in J:
+            # print(prod)
+            for i in range(len(prod.rs)):
+                if(prod.rs[i].dot):
+                    if(i+1 < len(prod.rs)):
+                        if(not prod.rs[i+1].terminal):
+                            for produ in self.ProductionsFinal:
+                                if produ.ls.label == prod.rs[i+1].label:
+                                    if(dotItem not in produ.rs):
+                                        produ.rs.insert(0, dotItem)
+                                        if produ not in J:
+                                            J.append(produ)
+        
+        return J
+    
+    def goto(self, items, symbol):
+        newState = []
+        for prod in items:
+            #print("Produccion: ", prod)
+            for i in range(len(prod.rs)):
+                if(prod.rs[i].dot):
+                    if(i+1 < len(prod.rs)):
+                        if(prod.rs[i+1].label == symbol):
+                            indice = prod.rs.index([x for x in prod.rs if x.dot][0])
+                            if indice < len(prod.rs):
+                                temp = prod.rs[indice+1]
+                                prod.rs[indice+1] = prod.rs[indice]
+                                prod.rs[indice] = temp
+                                newProd = Production(prod.ls, prod.rs)
+                                #print(newProd)
+                                newState.append(newProd)
+
+        return self.closure(newState)
+        
+    def get_Final_States(self, aumentada):
+        self.get_gramatical_symbols()
+        print()
+        NumStates = 0
+        finalStates = {}
+        C = self.closure([aumentada])
+        C = [C]
+        finalStates[f"I{NumStates}"] = C
+        for group in C:
+            for symbol in self.grammarSymbols:
+                result = self.goto(group, symbol)
+                if(result != []):
+                    print(symbol, result)
+                    print()
         
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
@@ -248,6 +316,6 @@ class YalpLector():
                 
         return linesWithoutTokens
 
-numberFile = 4
+numberFile = 1
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}')
 a.read()

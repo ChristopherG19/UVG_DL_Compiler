@@ -70,16 +70,11 @@ class Production():
         self.ls = leftSide
         self.rs = rightSide
     
-    def getPosPoint(self):
-        point = ProductionItem('°')
-        point.setPointType(True)
-        return self.rs.index(point.label)
-    
     def __str__(self) -> str:
         return f"{self.ls} → {self.rs}"
     
-    def first(self):
-        0
+    def __repr__(self):
+        return str(self)
 
 # Clase Transición: Representa las transiciones del autómata
 class Transition():
