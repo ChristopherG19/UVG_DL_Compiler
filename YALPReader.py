@@ -75,8 +75,8 @@ class YalpLector():
                 if (a[0] not in self.tokenBrackets):
                     self.tokenBrackets[valueBrackets] = a[0]
             else:
-                self.tokenBrackets[a[0].upper()] = None
-                    
+                self.tokenBrackets[a[0]] = None
+
         productionsLines = self.tokens(tokensYa)
         production = []
         for line in productionsLines:
@@ -96,7 +96,7 @@ class YalpLector():
             
         print("\n------ Producciones ------")
         newProductions = []
-        for i in self.productions:    
+        for i in self.productions: 
             temp = i.split(" ")
             newP = []
             for t in temp:
@@ -104,13 +104,11 @@ class YalpLector():
                     newP.append(t)
                     continue
                 else:
-                    t = t.capitalize()
                     newP.append(t)
             i = " ".join(newP)
             newProductions.append(i)
             print(i)
             
-        print()
         self.productions = newProductions
 
         newProductions = []
@@ -124,7 +122,6 @@ class YalpLector():
                     tempNewProduction.append(elem)
             newProductions.append(" ".join(tempNewProduction))
 
-        print()
         self.ProductionsFinal = []
         dotItem = ProductionItem('°')
         dotItem.setFinal(True)
@@ -147,20 +144,20 @@ class YalpLector():
                         newItem.setType(True)
                         listProd.append(newItem)
                     else:
-                        newItem = ProductionItem(elem[0], elem.lower())
+                        newItem = ProductionItem(elem[0].upper(), elem)
                         newItem.setType(False)
                         listProd.append(newItem)
-                        
+
                 listRight.append(listProd)
                
             for rightS in listRight: 
-                newT = ProductionItem(sides[0].strip()[0], sides[0].strip().lower())
+                newT = ProductionItem(sides[0].strip()[0].upper(), sides[0].strip())
                 newT.setType(False)
                 self.ProductionsFinal.append(Production(newT, rightS))
                 
         #print(self.ProductionsFinal)
                 
-        Aumentada = self.productions[0][0]
+        Aumentada = self.productions[0][0].upper()
         newItem = ProductionItem(Aumentada)
         newItemB = ProductionItem(f"{Aumentada}'")
         newProdAumentada = Production(newItemB, [dotItem, newItem])
@@ -168,7 +165,7 @@ class YalpLector():
         
         # for x in self.ProductionsFinal:
         #     print(x)
-        
+                        
         finalStates = self.get_Final_States(newProdAumentada)
         
         print()
@@ -186,12 +183,10 @@ class YalpLector():
         self.grammarSymbols = list(self.gramaticaSymbol)
                     
     def closure(self, productions):
-        #print("\nRecibi", productions)
         dotItem = ProductionItem('°')
         dotItem.setFinal(True)
         J = productions
         for prod in J:
-            # print("A", prod)
             for i in range(len(prod.rs)):
                 if(prod.rs[i].dot):
                     if(i+1 < len(prod.rs)):
@@ -234,6 +229,7 @@ class YalpLector():
         finalStates = {}
         C = self.closure([aumentada])
         finalStates[f"I{NumStates}"] = C
+        transitions = []
         Items = [C]
         for group in Items:
             for symbol in self.grammarSymbols:
@@ -242,6 +238,9 @@ class YalpLector():
                     if result not in finalStates.values():
                         NumStates += 1
                         finalStates[f"I{NumStates}"] = result
+                        for k,v in finalStates.items():
+                            if v == group:
+                                transitions.append([k, symbol, f"I{NumStates}"])
                     if result not in Items:
                         Items.append(result)
         print()
@@ -251,6 +250,7 @@ class YalpLector():
                 print(el)
             print()
         print()
+        print(transitions)
         
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
