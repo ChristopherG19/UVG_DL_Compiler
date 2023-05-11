@@ -71,10 +71,15 @@ class Production():
         self.rs = rightSide
     
     def __str__(self) -> str:
-        return f"{self.ls} → {self.rs}"
+        return f"{self.ls} → {' '.join([str(s) for s in self.rs])}"
     
     def __repr__(self):
         return str(self)
+    
+    def __eq__(self, other):
+        if not isinstance(other, Production):
+            return False
+        return self.ls == other.ls and self.rs == other.rs
 
 # Clase Transición: Representa las transiciones del autómata
 class Transition():

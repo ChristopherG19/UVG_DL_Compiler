@@ -143,7 +143,7 @@ class YalpLector():
                 listProd = []
                 for elem in prod.split(" "):
                     if(elem.isupper()):
-                        newItem = ProductionItem(elem, self.tokenBrackets[elem])
+                        newItem = ProductionItem(self.tokenBrackets[elem], elem)
                         newItem.setType(True)
                         listProd.append(newItem)
                     else:
@@ -166,9 +166,10 @@ class YalpLector():
         newProdAumentada = Production(newItemB, [dotItem, newItem])
         self.ProductionsFinal.insert(0, newProdAumentada)        
         
-        finalStates = self.get_Final_States(newProdAumentada)
         # for x in self.ProductionsFinal:
         #     print(x)
+        
+        finalStates = self.get_Final_States(newProdAumentada)
         
         print()
         
@@ -178,28 +179,29 @@ class YalpLector():
             for j in i.split(" "):
                 if j != ' ' and j != '' and j != '|' and j != '->' and j != '→':
                     if(j.isalnum()):
-                        self.gramaticaSymbol.add(j.upper())
+                        self.gramaticaSymbol.add(j)
                     else:
                         self.gramaticaSymbol.add(j)
                     
         self.grammarSymbols = list(self.gramaticaSymbol)
                     
     def closure(self, productions):
+        #print("\nRecibi", productions)
         dotItem = ProductionItem('°')
         dotItem.setFinal(True)
         J = productions
         for prod in J:
-            # print(prod)
+            # print("A", prod)
             for i in range(len(prod.rs)):
                 if(prod.rs[i].dot):
                     if(i+1 < len(prod.rs)):
                         if(not prod.rs[i+1].terminal):
                             for produ in self.ProductionsFinal:
                                 if produ.ls.label == prod.rs[i+1].label:
-                                    if(dotItem not in produ.rs):
+                                    if(not any([v.dot for v in produ.rs])):
                                         produ.rs.insert(0, dotItem)
-                                        if produ not in J:
-                                            J.append(produ)
+                                    if produ not in J:
+                                        J.append(produ)
         
         return J
     
@@ -210,32 +212,45 @@ class YalpLector():
             for i in range(len(prod.rs)):
                 if(prod.rs[i].dot):
                     if(i+1 < len(prod.rs)):
-                        if(prod.rs[i+1].label == symbol):
+                        comp = [k for k, v in self.tokenBrackets.items() if v == symbol]
+                        if(prod.rs[i+1].label == symbol or prod.rs[i+1].label == (comp[0] if len(comp)>0 else None)):
+                            #print(symbol, prod)
                             indice = prod.rs.index([x for x in prod.rs if x.dot][0])
                             if indice < len(prod.rs):
+                                newPrRS = prod.rs.copy()
                                 temp = prod.rs[indice+1]
-                                prod.rs[indice+1] = prod.rs[indice]
-                                prod.rs[indice] = temp
-                                newProd = Production(prod.ls, prod.rs)
-                                #print(newProd)
+                                newPrRS[indice+1] = prod.rs[indice]
+                                newPrRS[indice] = temp
+                                newProd = Production(prod.ls, newPrRS)
+                                #print(symbol, newProd)
                                 newState.append(newProd)
 
         return self.closure(newState)
         
     def get_Final_States(self, aumentada):
         self.get_gramatical_symbols()
-        print()
+
         NumStates = 0
         finalStates = {}
         C = self.closure([aumentada])
-        C = [C]
         finalStates[f"I{NumStates}"] = C
-        for group in C:
+        Items = [C]
+        for group in Items:
             for symbol in self.grammarSymbols:
                 result = self.goto(group, symbol)
                 if(result != []):
-                    print(symbol, result)
-                    print()
+                    if result not in finalStates.values():
+                        NumStates += 1
+                        finalStates[f"I{NumStates}"] = result
+                    if result not in Items:
+                        Items.append(result)
+        print()
+        for k,v in finalStates.items():
+            print(k, len(v))
+            for el in v:
+                print(el)
+            print()
+        print()
         
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
