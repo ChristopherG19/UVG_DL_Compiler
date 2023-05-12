@@ -5,8 +5,9 @@
 # Christopher García 20541
 
 import pickle
+from automatas.AFD import AFD
 from tools.components import *
-from automatas import *
+from tools.showGraph import showGraphDFA
 
 class YalpLector():
     def __init__(self, file, tokensYal):
@@ -161,12 +162,14 @@ class YalpLector():
         newItem = ProductionItem(Aumentada)
         newItemB = ProductionItem(f"{Aumentada}'")
         newProdAumentada = Production(newItemB, [dotItem, newItem])
+        self.AumentadaEl = newItem
+        self.AumentadaElB = newItemB
         self.ProductionsFinal.insert(0, newProdAumentada)        
         
         # for x in self.ProductionsFinal:
         #     print(x)
                         
-        finalStates = self.get_Final_States(newProdAumentada)
+        self.get_Final_States(newProdAumentada)
         
         print()
         
@@ -236,21 +239,47 @@ class YalpLector():
                 result = self.goto(group, symbol)
                 if(result != []):
                     if result not in finalStates.values():
+                        Items.append(result)
                         NumStates += 1
                         finalStates[f"I{NumStates}"] = result
                         for k,v in finalStates.items():
                             if v == group:
-                                transitions.append([k, symbol, f"I{NumStates}"])
-                    if result not in Items:
-                        Items.append(result)
-        print()
+                                transitions.append(Transition(k, symbol, f"I{NumStates}"))
+                    else:
+                        for k,v in finalStates.items():
+                            if v == group:
+                                for k2,v2 in finalStates.items():
+                                    if v2 == result:
+                                        transitions.append(Transition(k, symbol, k2))
+        
+        InState = None
+        FnState = None            
         for k,v in finalStates.items():
             print(k, len(v))
             for el in v:
+                if el.ls.label == self.AumentadaElB.label:
+                    for i in range(len(el.rs)):
+                        if el.rs[i].label == self.AumentadaEl.label and el.rs[i-1].dot:
+                            FnState = k
+                            break
+                    for i in range(len(el.rs)):
+                        if(i+1 < len(el.rs)):
+                            if el.rs[i].dot and el.rs[i+1].label == self.AumentadaEl.label:
+                                InState = k
+                                break
                 print(el)
             print()
-        print()
-        print(transitions)
+
+        # print("Estado inicial", InState)
+        # print("Estado final", FnState)
+        # print("Cantidad de estados:", len(finalStates.keys()))
+        # print("Transiciones:")
+        # for trans in transitions:
+        #   print(trans)
+        # print("Estados:", list(finalStates.keys()))
+        
+        lr0 = AFD(InState, [FnState], len(finalStates.keys()), transitions, list(finalStates.keys()))
+        showGraphDFA(lr0, "LR0_3")
         
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
@@ -331,6 +360,6 @@ class YalpLector():
                 
         return linesWithoutTokens
 
-numberFile = 1
+numberFile = 3
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}')
 a.read()

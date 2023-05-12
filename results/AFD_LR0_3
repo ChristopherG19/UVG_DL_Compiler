@@ -1,0 +1,24 @@
+// AFD
+digraph {
+	rankdir=LR
+	start -> I0
+	start [shape=point]
+	I1 [shape=doublecircle]
+	I2 [shape=circle]
+	I3 [shape=circle]
+	I4 [shape=circle]
+	I5 [shape=circle]
+	I6 [shape=circle]
+	I7 [shape=circle]
+	I0 -> I1 [label=E]
+	I0 -> I2 [label=T]
+	I0 -> I3 [label="("]
+	I2 -> I4 [label="+"]
+	I3 -> I5 [label=E]
+	I3 -> I2 [label=T]
+	I3 -> I3 [label="("]
+	I4 -> I6 [label=E]
+	I4 -> I2 [label=T]
+	I4 -> I3 [label="("]
+	I5 -> I7 [label=")"]
+}
