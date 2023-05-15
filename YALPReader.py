@@ -10,13 +10,14 @@ from tools.components import *
 from tools.showGraph import showGraphDFA
 
 class YalpLector():
-    def __init__(self, file, tokensYal):
+    def __init__(self, file, tokensYal, numberFile):
         self.file = file
         self.tokensYalp = []
         self.grammar = []
         self.grammarSymbols = []
         self.productions = []
         self.finalLines = []
+        self.numberFile = numberFile
     
         with open(tokensYal, 'rb') as f:
             pickle.load(f)
@@ -141,33 +142,39 @@ class YalpLector():
                 listProd = []
                 for elem in prod.split(" "):
                     if(elem.isupper()):
-                        newItem = ProductionItem(self.tokenBrackets[elem], elem)
+                        newItem = ProductionItem(elem, self.tokenBrackets[elem])
                         newItem.setType(True)
                         listProd.append(newItem)
                     else:
-                        newItem = ProductionItem(elem[0].upper(), elem)
-                        newItem.setType(False)
-                        listProd.append(newItem)
+                        if elem in [x.lower() for x in self.tokensVeri]:
+                            newItem = ProductionItem(elem.upper(), self.tokenBrackets[elem.upper()])
+                            newItem.setType(True)
+                            listProd.append(newItem)
+                        else:
+                            newItem = ProductionItem(elem, elem[0].upper())
+                            newItem.setType(False)
+                            listProd.append(newItem)
 
                 listRight.append(listProd)
                
             for rightS in listRight: 
-                newT = ProductionItem(sides[0].strip()[0].upper(), sides[0].strip())
+                newT = ProductionItem(sides[0].strip().replace(":",""), sides[0].strip()[0].upper())
                 newT.setType(False)
                 self.ProductionsFinal.append(Production(newT, rightS))
                 
         #print(self.ProductionsFinal)
-                
-        Aumentada = self.productions[0][0].upper()
-        newItem = ProductionItem(Aumentada)
+
+        Aumentada = self.ProductionsFinal[0].ls
         newItemB = ProductionItem(f"{Aumentada}'")
-        newProdAumentada = Production(newItemB, [dotItem, newItem])
-        self.AumentadaEl = newItem
+        newProdAumentada = Production(newItemB, [dotItem, Aumentada])
+        self.AumentadaEl = Aumentada
         self.AumentadaElB = newItemB
         self.ProductionsFinal.insert(0, newProdAumentada)        
         
-        # for x in self.ProductionsFinal:
-        #     print(x)
+        print("\n------ Producciones Finales ------")
+        for x in self.ProductionsFinal:
+            print(x)
+        print()
                         
         self.get_Final_States(newProdAumentada)
         
@@ -175,16 +182,19 @@ class YalpLector():
         
     def get_gramatical_symbols(self):
         self.gramaticaSymbol = set()
-        for i in self.grammar:
-            for j in i.split(" "):
-                if j != ' ' and j != '' and j != '|' and j != '->' and j != '→':
-                    if(j.isalnum()):
-                        self.gramaticaSymbol.add(j)
+        for i in self.ProductionsFinal:
+            if(i.ls == self.AumentadaElB):
+                pass
+            else:
+                for j in i.rs:
+                    if j.dot:
+                        continue
                     else:
-                        self.gramaticaSymbol.add(j)
-                    
-        self.grammarSymbols = list(self.gramaticaSymbol)
-                    
+                        self.gramaticaSymbol.add(j.label)
+                self.gramaticaSymbol.add(i.ls.label)
+                
+        self.grammarSymbols = sorted(list(self.gramaticaSymbol))
+                 
     def closure(self, productions):
         dotItem = ProductionItem('°')
         dotItem.setFinal(True)
@@ -224,10 +234,24 @@ class YalpLector():
                                 newState.append(newProd)
 
         return self.closure(newState)
+      
+    def first(self, symbol):
+        firstSet = []
+        for i in self.ProductionsFinal:
+            if i.ls.label == symbol:
+                if not i.rs[0].terminal:
+                    self.first(i.rs[0])
+                else:
+                    if i.rs[0] not in firstSet:
+                        firstSet.append(i.rs[0])                    
+                    
+        return firstSet
         
+    def follow(self, symbol):
+        0  
+      
     def get_Final_States(self, aumentada):
         self.get_gramatical_symbols()
-
         NumStates = 0
         finalStates = {}
         C = self.closure([aumentada])
@@ -279,7 +303,7 @@ class YalpLector():
         # print("Estados:", list(finalStates.keys()))
         
         lr0 = AFD(InState, [FnState], len(finalStates.keys()), transitions, list(finalStates.keys()))
-        showGraphDFA(lr0, "LR0_3")
+        showGraphDFA(lr0, f"LR0_{self.numberFile}")
         
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
@@ -346,6 +370,7 @@ class YalpLector():
             print("Tokens Yalp presentes en Yal: No estan todos definidos\n")
             for el in notDefined:
                 print(f"Token: {el} no definido en yal")
+            print()
         else:
             print("Tokens Yalp presentes en Yal: Si estan todos definidos\n")
 
@@ -357,9 +382,10 @@ class YalpLector():
                 continue
             else:
                 print(f"Token: {tok} ignorado")   
-                
+            
+        self.tokensVeri = list(set(alltokens) - notDefined)
         return linesWithoutTokens
 
-numberFile = 3
-a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}')
+numberFile = 4
+a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', numberFile)
 a.read()
