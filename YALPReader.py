@@ -18,6 +18,7 @@ class YalpLector():
         self.productions = []
         self.finalLines = []
         self.numberFile = numberFile
+        self.checkProductions = {}
     
         with open(tokensYal, 'rb') as f:
             pickle.load(f)
@@ -175,6 +176,9 @@ class YalpLector():
         for x in self.ProductionsFinal:
             print(x)
         print()
+        resultFirst = self.first('expression')
+        print(resultFirst)
+        print()
                         
         self.get_Final_States(newProdAumentada)
         
@@ -183,15 +187,12 @@ class YalpLector():
     def get_gramatical_symbols(self):
         self.gramaticaSymbol = set()
         for i in self.ProductionsFinal:
-            if(i.ls == self.AumentadaElB):
-                pass
-            else:
-                for j in i.rs:
-                    if j.dot:
-                        continue
-                    else:
-                        self.gramaticaSymbol.add(j.label)
-                self.gramaticaSymbol.add(i.ls.label)
+            for j in i.rs:
+                if j.dot:
+                    continue
+                else:
+                    self.gramaticaSymbol.add(j.label)
+            self.gramaticaSymbol.add(i.ls.label)
                 
         self.grammarSymbols = sorted(list(self.gramaticaSymbol))
                  
@@ -238,17 +239,44 @@ class YalpLector():
     def first(self, symbol):
         firstSet = []
         for i in self.ProductionsFinal:
-            if i.ls.label == symbol:
-                if not i.rs[0].terminal:
-                    self.first(i.rs[0])
+            if i.ls.label == symbol:                
+                if i.rs[0].label == 'ε':
+                    firstSet.append(i.rs[0])
+                    self.checkProductions[symbol] = firstSet
+                    return firstSet
                 else:
-                    if i.rs[0] not in firstSet:
-                        firstSet.append(i.rs[0])                    
+                    if i.rs[0].terminal:
+                        firstSet.append(i.ls)
+                        self.checkProductions[symbol] = firstSet
+                        return firstSet
+                
+            else:
+                if i.rs[0] not in firstSet:
+                    if i.rs[0].terminal:
+                        firstSet.append(i.rs[0]) 
                     
+                if i.rs[0].label not in self.checkProductions:
+                    self.checkProductions[i.rs[0].label] = None
+                    for x in self.first(i.rs[0].label):
+                        if x not in firstSet:
+                            if x.terminal:
+                                firstSet.append(x)
+                else:
+                    l = self.checkProductions[i.rs[0].label]
+                    if l != None:
+                        for x in l: 
+                            if x not in firstSet:
+                                if x.terminal:
+                                    firstSet.append(x)
+                                    
+                    
+        self.checkProductions[symbol] = firstSet
         return firstSet
-        
+            
     def follow(self, symbol):
-        0  
+        followSet = []
+        for i in self.ProductionsFinal:
+            0
       
     def get_Final_States(self, aumentada):
         self.get_gramatical_symbols()
@@ -386,6 +414,6 @@ class YalpLector():
         self.tokensVeri = list(set(alltokens) - notDefined)
         return linesWithoutTokens
 
-numberFile = 4
+numberFile = 1
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', numberFile)
 a.read()
