@@ -153,8 +153,8 @@ class ScannerGen():
             f.write("\t\tprint(f'-> Valor: {temp} | Token: {tokens_returns(token[1])}')\n")
             f.write("\n\n")
             
-name = 'yal5'     
-Scan = ScannerGen(f'scanners_dfa/AFD_{name}', './yalp-tests/slr-1.yalp')
+name = 'yal2'     
+Scan = ScannerGen(f'scanners_dfa/AFD_{name}', './yalex-tests/lectura.txt')
 listToks = Scan.simulate()
 print("Lectura de archivo y obtención de tokens\n")
 Scan.print_listTokens(listToks)
