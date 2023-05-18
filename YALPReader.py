@@ -126,6 +126,7 @@ class YalpLector():
             newProductions.append(" ".join(tempNewProduction))
 
         self.ProductionsFinal = []
+        self.terminales = []
         dotItem = ProductionItem('°')
         dotItem.setFinal(True)
         for element in newProductions:
@@ -146,11 +147,13 @@ class YalpLector():
                         newItem = ProductionItem(elem, self.tokenBrackets[elem])
                         newItem.setType(True)
                         listProd.append(newItem)
+                        self.terminales.append(elem)
                     else:
                         if elem in [x.lower() for x in self.tokensVeri]:
                             newItem = ProductionItem(elem.upper(), self.tokenBrackets[elem.upper()])
                             newItem.setType(True)
                             listProd.append(newItem)
+                            self.terminales.append(elem.upper())
                         else:
                             newItem = ProductionItem(elem, elem[0].upper())
                             newItem.setType(False)
@@ -164,6 +167,7 @@ class YalpLector():
                 self.ProductionsFinal.append(Production(newT, rightS))
                 
         #print(self.ProductionsFinal)
+        self.tempProductionsFinal = self.ProductionsFinal
 
         Aumentada = self.ProductionsFinal[0].ls
         newItemB = ProductionItem(f"{Aumentada}'")
@@ -176,8 +180,16 @@ class YalpLector():
         for x in self.ProductionsFinal:
             print(x)
         print()
+        
+        print("\n------ First ------")
         resultFirst = self.first('expression')
-        print(resultFirst)
+        resultFirstB = self.first('term')
+        resultFirstC = self.first('factor')
+        resultFirstD = self.first('PLUS')
+        print("First expression:",resultFirst)
+        print("First term:",resultFirstB)
+        print("First factor:",resultFirstC)
+        print("First PLUS:",resultFirstD)
         print()
                         
         self.get_Final_States(newProdAumentada)
@@ -238,40 +250,25 @@ class YalpLector():
       
     def first(self, symbol):
         firstSet = []
-        for i in self.ProductionsFinal:
-            if i.ls.label == symbol:                
-                if i.rs[0].label == 'ε':
-                    firstSet.append(i.rs[0])
-                    self.checkProductions[symbol] = firstSet
-                    return firstSet
-                else:
-                    if i.rs[0].terminal:
-                        firstSet.append(i.ls)
-                        self.checkProductions[symbol] = firstSet
-                        return firstSet
-                
-            else:
-                if i.rs[0] not in firstSet:
-                    if i.rs[0].terminal:
-                        firstSet.append(i.rs[0]) 
-                    
-                if i.rs[0].label not in self.checkProductions:
-                    self.checkProductions[i.rs[0].label] = None
-                    for x in self.first(i.rs[0].label):
-                        if x not in firstSet:
-                            if x.terminal:
-                                firstSet.append(x)
-                else:
-                    l = self.checkProductions[i.rs[0].label]
-                    if l != None:
-                        for x in l: 
-                            if x not in firstSet:
-                                if x.terminal:
-                                    firstSet.append(x)
-                                    
-                    
-        self.checkProductions[symbol] = firstSet
+        stack = [symbol]
+        checkProds = [symbol]
+
+        if symbol in self.terminales:
+            return stack
+        else:
+            while stack:
+                check = stack.pop(0)
+                for prod in self.ProductionsFinal:
+                    if prod.ls.label == check:
+                        if prod.rs[0].label in self.terminales:
+                            firstSet.append(prod.rs[0].label)
+                        else:
+                            if prod.rs[0].label not in stack and prod.rs[0].label not in checkProds:
+                                stack.append(prod.rs[0].label)
+                                checkProds.append(prod.rs[0].label)
+        
         return firstSet
+        
             
     def follow(self, symbol):
         followSet = []
