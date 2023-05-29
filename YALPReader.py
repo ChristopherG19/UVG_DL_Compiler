@@ -169,6 +169,7 @@ class YalpLector():
         #print(self.ProductionsFinal)
         self.tempProductionsFinal = self.ProductionsFinal
 
+        self.simboloInicial = self.ProductionsFinal[0].ls
         Aumentada = self.ProductionsFinal[0].ls
         newItemB = ProductionItem(f"{Aumentada}'")
         newProdAumentada = Production(newItemB, [dotItem, Aumentada])
@@ -186,10 +187,12 @@ class YalpLector():
         resultFirstB = self.first('term')
         resultFirstC = self.first('factor')
         resultFirstD = self.first('PLUS')
+        resultFirstE = self.follow('term')
         print("First expression:",resultFirst)
         print("First term:",resultFirstB)
         print("First factor:",resultFirstC)
         print("First PLUS:",resultFirstD)
+        print("Follow term:",resultFirstE)
         print()
                         
         self.get_Final_States(newProdAumentada)
@@ -229,13 +232,11 @@ class YalpLector():
     def goto(self, items, symbol):
         newState = []
         for prod in items:
-            #print("Produccion: ", prod)
             for i in range(len(prod.rs)):
                 if(prod.rs[i].dot):
                     if(i+1 < len(prod.rs)):
                         comp = [k for k, v in self.tokenBrackets.items() if v == symbol]
                         if(prod.rs[i+1].label == symbol or prod.rs[i+1].label == (comp[0] if len(comp)>0 else None)):
-                            #print(symbol, prod)
                             indice = prod.rs.index([x for x in prod.rs if x.dot][0])
                             if indice < len(prod.rs):
                                 newPrRS = prod.rs.copy()
@@ -243,7 +244,6 @@ class YalpLector():
                                 newPrRS[indice+1] = prod.rs[indice]
                                 newPrRS[indice] = temp
                                 newProd = Production(prod.ls, newPrRS)
-                                #print(symbol, newProd)
                                 newState.append(newProd)
 
         return self.closure(newState)
@@ -272,8 +272,25 @@ class YalpLector():
             
     def follow(self, symbol):
         followSet = []
-        for i in self.ProductionsFinal:
-            0
+        
+        if(symbol == self.simboloInicial.label):
+            followSet.append('$')
+        
+        for prod in self.ProductionsFinal:
+            for i in range(len(prod.rs)):
+                if(symbol == prod.rs[i].label):
+                    if(prod.rs[i].label == prod.rs[-1].label):
+                        fol = self.follow(prod.ls.label)
+                        for el in fol:
+                            if el not in followSet:
+                                followSet.append(el)
+                    if ((i+1) < len(prod.rs)):
+                        firs = self.first(prod.rs[i+1].label)
+                        for el in firs:
+                            if el not in followSet:
+                                followSet.append(el)
+
+        return followSet
       
     def get_Final_States(self, aumentada):
         self.get_gramatical_symbols()
