@@ -4,10 +4,12 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
+import copy
 import pickle
 from automatas.AFD import AFD
 from tools.components import *
 from tools.showGraph import showGraphDFA
+from prettytable import PrettyTable
 
 class YalpLector():
     def __init__(self, file, tokensYal, numberFile):
@@ -19,6 +21,7 @@ class YalpLector():
         self.finalLines = []
         self.numberFile = numberFile
         self.checkProductions = {}
+        self.prods = []
     
         with open(tokensYal, 'rb') as f:
             pickle.load(f)
@@ -166,9 +169,8 @@ class YalpLector():
                 newT.setType(False)
                 self.ProductionsFinal.append(Production(newT, rightS))
                 
-        #print(self.ProductionsFinal)
-        self.tempProductionsFinal = self.ProductionsFinal
-
+        self.prods = [copy.deepcopy(objeto) for objeto in self.ProductionsFinal]
+                
         self.simboloInicial = self.ProductionsFinal[0].ls
         Aumentada = self.ProductionsFinal[0].ls
         newItemB = ProductionItem(f"{Aumentada}'")
@@ -182,18 +184,18 @@ class YalpLector():
             print(x)
         print()
         
-        print("\n------ First ------")
-        resultFirst = self.first('expression')
-        resultFirstB = self.first('term')
-        resultFirstC = self.first('factor')
-        resultFirstD = self.first('PLUS')
-        resultFirstE = self.follow('term')
-        print("First expression:",resultFirst)
-        print("First term:",resultFirstB)
-        print("First factor:",resultFirstC)
-        print("First PLUS:",resultFirstD)
-        print("Follow term:",resultFirstE)
-        print()
+        # print("\n------ First y Follow ------")
+        # resultFirst = self.first('expression')
+        # resultFirstB = self.first('term')
+        # resultFirstC = self.first('factor')
+        # resultFirstD = self.first('PLUS')
+        # resultFirstE = self.follow('term')
+        # print("First expression:",resultFirst)
+        # print("First term:",resultFirstB)
+        # print("First factor:",resultFirstC)
+        # print("First PLUS:",resultFirstD)
+        # print("Follow term:",resultFirstE)
+        # print()
                         
         self.get_Final_States(newProdAumentada)
         
@@ -272,7 +274,7 @@ class YalpLector():
             
     def follow(self, symbol):
         followSet = []
-        
+
         if(symbol == self.simboloInicial.label):
             followSet.append('$')
         
@@ -280,10 +282,11 @@ class YalpLector():
             for i in range(len(prod.rs)):
                 if(symbol == prod.rs[i].label):
                     if(prod.rs[i].label == prod.rs[-1].label):
-                        fol = self.follow(prod.ls.label)
-                        for el in fol:
-                            if el not in followSet:
-                                followSet.append(el)
+                        if(symbol != prod.ls.label):
+                            fol = self.follow(prod.ls.label)
+                            for el in fol:
+                                if el not in followSet:
+                                    followSet.append(el)
                     if ((i+1) < len(prod.rs)):
                         firs = self.first(prod.rs[i+1].label)
                         for el in firs:
@@ -300,10 +303,13 @@ class YalpLector():
         finalStates[f"I{NumStates}"] = C
         transitions = []
         Items = [C]
+        movements = []
+        Nmovements = []
         for group in Items:
             for symbol in self.grammarSymbols:
                 result = self.goto(group, symbol)
                 if(result != []):
+                    movements.append((group, symbol, result))
                     if result not in finalStates.values():
                         Items.append(result)
                         NumStates += 1
@@ -317,6 +323,18 @@ class YalpLector():
                                 for k2,v2 in finalStates.items():
                                     if v2 == result:
                                         transitions.append(Transition(k, symbol, k2))
+        
+        for x,y in finalStates.items():
+            for m in movements:
+                if m[0] == y:
+                    for x2,y2 in finalStates.items():
+                        if m[2] == y2:
+                            Nmovements.append((x, m[1], x2))
+                            break
+                    
+        # for val in Nmovements:
+        #     print(val[0], val[1], val[2])
+        #     print()
         
         InState = None
         FnState = None            
@@ -346,6 +364,123 @@ class YalpLector():
         
         lr0 = AFD(InState, [FnState], len(finalStates.keys()), transitions, list(finalStates.keys()))
         showGraphDFA(lr0, f"LR0_{self.numberFile}")
+                
+        action = []
+        goto = []
+        
+        for ele in self.grammarSymbols:
+            if ele != self.AumentadaElB.label:
+                if ele.isupper():
+                    action.append(ele)
+                else:
+                    goto.append(ele)  
+        
+        action.append('$')    
+        
+        actions = self.get_actions_list(action, finalStates, Nmovements, FnState)
+        gotos = self.get_goto_list(goto, transitions)
+        
+        columnsActions = {}
+        for elA in action:
+            column = []
+            for act in actions[0]:
+                if elA == act[1]:
+                    column.append((act[0], act[2]))
+                    
+            for act in actions[1]:
+                for el in act[1]:
+                    if elA == el:
+                        column.append((act[0], act[2]))
+
+            columnsActions[elA] = column
+        
+        finalColumnA = {}
+        for x,y in columnsActions.items():
+            newColumn = ['' for x in range(len(finalStates.keys()))]
+            for i in y:
+                newColumn[int(i[0][1:])] = i[1]
+            
+            if(x == '$'):
+                newColumn[int(FnState[1:])] = 'acc'
+            
+            finalColumnA[x] = newColumn
+            
+        columnsGoto = {}
+        for elG in goto:
+            column = []
+            for got in gotos:
+                if elG == got[1]:
+                    column.append((got[0], got[2][1:]))
+                    
+            columnsGoto[elG] = column
+
+        finalColumnG = {}
+        for x,y in columnsGoto.items():
+            newColumn = ['' for x in range(len(finalStates.keys()))]
+            for i in y:
+                newColumn[int(i[0][1:])] = i[1]
+
+            finalColumnG[x] = newColumn
+
+        prettyT = PrettyTable()
+        prettyT.add_column("State", list(finalStates.keys()))
+            
+        for elA in action:
+            prettyT.add_column(elA, finalColumnA[elA])
+
+        for elG in goto:
+            prettyT.add_column(elG, finalColumnG[elG])            
+
+        prettyT.align = "c"
+        prettyT.title = "Tabla de parseo SLR(1)"
+        print(prettyT)
+      
+    def get_actions_list(self, action, statesR, gotosM, fnState):
+        actions_shift = []
+        actions_reduce = []
+        
+        for nState, states in statesR.items():
+            for symbol in action:
+                for state in states:
+                    for i in range(len(state.rs)):
+                        if(i+1 < len(state.rs)):
+                            if state.rs[i].dot and state.rs[i+1].label == symbol:
+                                for gotoM in gotosM:
+                                    if(gotoM[0] == nState and gotoM[1] == symbol):
+                                        # print((nState, symbol, 'S'+gotoM[2][1:]))
+                                        actions_shift.append((nState, symbol, 'S'+gotoM[2][1:]))
+                                        break
+        
+        dicProds = {}
+        for el in range(1,len(self.prods)+1):
+            dicProds[el] = self.prods[el-1]            
+            
+        for nState, states in statesR.items():
+            for state in states:
+                if state.rs[-1].dot:
+                    # print(nState, state, self.follow(state.ls.label))
+                    prodVeri = Production(state.ls, state.rs[:-1])
+                    if(nState != fnState):
+                        for x,y in dicProds.items():
+                            if (y.ls.label == prodVeri.ls.label):
+                                for m, n in zip(y.rs, prodVeri.rs):
+                                    if m.label == n.label:
+                                        # print(nState, state, x)
+                                        followL = self.follow(state.ls.label)
+                                        actions_reduce.append((nState, followL, 'r'+str(x)))
+                                        break
+        
+        return (actions_shift, actions_reduce)
+        
+    def get_goto_list(self, goto, transitions):
+        gotos_l = []
+        
+        for trans in transitions:
+            for el in goto:
+                if trans.symbol == el:
+                    gotos_l.append((trans.inState, trans.symbol, trans.fnState))
+        
+        return gotos_l
         
     def get_brackets_info(self, texto):
         llave_abierta = texto.find("{")
@@ -428,6 +563,6 @@ class YalpLector():
         self.tokensVeri = list(set(alltokens) - notDefined)
         return linesWithoutTokens
 
-numberFile = 1
+numberFile = 6
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', numberFile)
 a.read()
