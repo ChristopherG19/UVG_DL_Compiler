@@ -200,9 +200,8 @@ class YalpLector():
         # print("Follow term:",resultFirstE)
         # print()
                         
-        self.get_Final_States(newProdAumentada)
-        
         print()
+        return self.get_Final_States(newProdAumentada)
         
     def get_gramatical_symbols(self):
         self.gramaticaSymbol = set()
@@ -437,7 +436,9 @@ class YalpLector():
         prettyT.align = "c"
         prettyT.title = "Tabla de parseo SLR(1)"
         print(prettyT)
-      
+        
+        return self.simulate(list(finalStates.keys()), actions, gotos, FnState)
+            
     def get_actions_list(self, action, statesR, gotosM, fnState):
         actions_shift = []
         actions_reduce = []
@@ -454,9 +455,9 @@ class YalpLector():
                                         actions_shift.append((nState, symbol, 'S'+gotoM[2][1:]))
                                         break
         
-        dicProds = {}
+        self.dicProds = {}
         for el in range(1,len(self.prods)+1):
-            dicProds[el] = self.prods[el-1]      
+            self.dicProds[el] = self.prods[el-1]      
             
         for nState, states in statesR.items():
             for state in states:
@@ -464,7 +465,7 @@ class YalpLector():
                     # print(nState, state, self.follow(state.ls.label))
                     prodVeri = Production(state.ls, state.rs[:-1])
                     if(nState != fnState):
-                        for x,y in dicProds.items():
+                        for x,y in self.dicProds.items():
                             if (y.ls.label == prodVeri.ls.label):
                                 for m, n in zip(y.rs, prodVeri.rs):
                                     if(len(y.rs) == len(prodVeri.rs)):
@@ -566,7 +567,119 @@ class YalpLector():
             
         self.tokensVeri = list(set(alltokens) - notDefined)
         return linesWithoutTokens
+    
+    def simulate(self, states, actions, gotos, fnState):
+        result = "No"
+        tokensLectura = []
+        for tok in self.tokensText:
+            for x,y in self.tokenBrackets.items():
+                if(x == tok[1]):
+                    if y == None:
+                        continue
+                else:
+                    if(y == tok[1]):
+                        tokensLectura.append((tok[0], x))
+                            
+        stackStates = [states[0]]
+        stackSymbols = ['$']
+        stackInput = []
+        Actions = []
+        
+        for tok in tokensLectura:
+            stackInput.append(tok[1])
+        stackInput.append("$")
 
+        allStacksStates = []
+        allStackSymbols = []
+        allStackInput = []
+        
+        allStacksStates.append(stackStates.copy())
+        allStackSymbols.append(stackSymbols.copy())
+        allStackInput.append(stackInput.copy())
+
+        # Se agrega el primer simbolo
+        first_Action = self.check_action(actions, stackStates[-1], stackInput[0], fnState)
+        stackSymbols.append(stackInput.pop(0))
+        if first_Action[0] == 'S':
+            Actions.append(f'Shift to I{first_Action[1:]}')
+            stackStates.append(f'I{first_Action[1:]}')
+        elif first_Action[0] == 'r':
+            getProd = self.dicProds[int(first_Action[1:])]
+            Actions.append(f'Reduce by {getProd}')
+            for x in range(len(getProd.rs)):
+                stackSymbols.pop(0)
+            stackSymbols.append(getProd.ls.label)
+            
+        while(1):
+            allStacksStates.append(stackStates.copy())
+            allStackSymbols.append(stackSymbols.copy())
+            allStackInput.append(stackInput.copy())
+            new_Action = self.check_action(actions, stackStates[-1], stackInput[0], fnState)
+            if new_Action[0] == 'S':
+                stackSymbols.append(stackInput.pop(0))
+                Actions.append(f'Shift to I{new_Action[1:]}')
+                stackStates.append(f'I{new_Action[1:]}')
+                
+            elif new_Action[0] == 'r':
+                getProd = self.dicProds[int(new_Action[1:])]
+                Actions.append(f'Reduce by {getProd}')
+                
+                for x in range(len(getProd.rs)):
+                    stackSymbols.pop(-1)
+                    stackStates.pop(-1)
+                stackSymbols.append(getProd.ls.label)
+                
+                for goto in gotos:
+                    if(goto[0] == stackStates[-1] and goto[1] == stackSymbols[-1]):
+                        stackStates.append(goto[2])
+                        break
+            elif new_Action == 'Accept':
+                Actions.append('Accept')
+                result = "Yes"
+                break
+            else:
+                Actions.append(new_Action)
+                break
+            
+        if any([len(Actions) > len(x) for x in [allStacksStates, allStackInput, allStackSymbols]]) or any([len(Actions) < len(x) for x in [allStacksStates, allStackInput, allStackSymbols]]):
+            print()
+            for x in Actions:
+                print("-",x[:-1]+allStackInput[0][0])
+        else:
+            prettyT = PrettyTable()
+            prettyT.add_column("State", [x for x in range(len(Actions))])
+            prettyT.add_column("Stack", allStacksStates)
+            prettyT.add_column("Symbols", allStackSymbols)
+            prettyT.add_column("Input", allStackInput)
+            prettyT.add_column("Actions", Actions)
+
+            prettyT.align = "c"
+            prettyT.title = "Tabla de parseo SLR(1) Simulación"
+            print(prettyT)
+
+        return result
+    
+    def check_action(self, actions, state, symbol, fnState):
+        # Se revisan shifts
+        for shift in actions[0]:
+            if(shift[0] == state and shift[1] == symbol):
+                return shift[2]
+            
+        # Se revisan reduces
+        for reduce in actions[1]:
+            if(reduce[0] == state and symbol in reduce[1]):
+                return reduce[2]
+            
+        if state == fnState and symbol == "$":
+            return "Accept"
+        
+        return f"Error sintáctico en estado {state} con {symbol}"
+    
 numberFile = 1
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', f'./tokens/tokens_text_yal{numberFile}',numberFile)
-a.read()
+result = a.read()
+print()
+print("-"*50)
+print("Lectura final del archivo, es aceptado:", result)
+print("-"*50)
+print()
