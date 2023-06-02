@@ -5,64 +5,113 @@
 # Christopher García 20541
 
 from automatas.AFN import *
-from tools.showGraph import showGraph
+from automatas.subconjuntos import *
+from tools.showGraph import *
 from tools.verification import Verification
+from simulation.nfaSimulation import *
+from simulation.dfaSimulation import *
+from automatas.construccionDirecta import *
+from automatas.minimizacion import *
+from tools.YALReader import *
+import pickle
+ 
+''' Expresiones pruebas '''
+# word = '(a*|b*)c' 
+# word = '(b|b)*abb(a|b)*' 
+# word = '(a|ε)b(a?)c?' 
+# word = '(a|b)*a(a|b)(a|b)' 
+# word = 'b*ab?' 
+# word = 'b+abc+' 
+# word = 'ab*ab*' 
+# word = '0(0|1)*0' 
+# word = '((ε|0)1*)*' 
+# word = '(0|1)*0(0|1)(0|1)' 
+# word = '(0*0)*(1*1)*' 
+# word = '(0|1)1*(0|1)' 
+# word = '0?(1|ε)?0*' 
+# word = '((1?)*)*' 
+# word = '(01)*(10)*' 
 
-# a(a|b)*b
+''' Expresiones prelaboratorio '''
+# word = 'ab*ab*' 
+# word = '0?(1?)?0*' 
+# word = '(a*|b*)c' 
+# word = '(b|b)*abb(a|b)*' 
+# word = '(a|ε)b(a+)c?' 
+# word = '(a|b)*a(a|b)(a|b)' 
 
-#a*
-#a**
-#(a|b)*
-#(a|b)
-#(a*|b)* 
-#(a|b)*a(a|b)*(a|b)
-#(a|b)*ab*(a|b)*(a|b)a+a?
-#|a||a||
+# word = '(a|b)*a(a|b)(a|b)'
+# cadena = 'aabc'
 
-t = True
+nameFile = "slr-5"
+yal = YalLector(f'./yalex-tests/{nameFile}.yal')
+word, wordVerify, definitions = yal.read()
+
+Obj = Conversion(word)
+Obj2 = Conversion(wordVerify)
+postfixExp = Obj.infixToPostfix()
+postfixExpV2 = Obj2.infixToPostfix()
+alphabet = Obj.get_alphabet()
+alphabetV2 = Obj2.get_alphabet()
+print("Alfabeto: ", alphabet)
+
+newSim = Simbolo('#') 
+newSim2 = Simbolo('.') 
+newSim2.setType(True)
+NPos = postfixExp.copy()
+NPos.append(newSim)
+NPos.append(newSim2)
+
 print()
-while(t):
-    word = input("Ingrese expresión: ")
-    if word == 'exit':
-        t = False
-        print()
-    else:
-        print("\nExpresión ingresada: "+word)
-        veri = Verification(word).Comprobacion()
+ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
+print("Postfix: ", "".join(ls))
+print()
 
-        errores = 0
-        for regla in veri:
-            if(not regla[0]):
-                errores += 1
-            
-        if (errores > 0):
-            print("Tienes los siguientes errores: \n")
-            for regla in veri:
-                if(not regla[0]):
-                    if (regla[3] == 'A'):
-                        print('-> ',regla[1])
-                        print("Revisar paréntesis de cierre o apertura de las siguientes posiciones: ", ",".join(str(x) for x in regla[2]))
-                        print()
-                    elif (regla[3] == 'B'):
-                        print('-> ',regla[1])
-                        if(type(regla[2]) == list):
-                            print("Revisar or's en las siguientes posiciones: ", ",".join(str(x) for x in regla[2]))
-                        else:
-                            print("Revisar or's en la expresion ingresada: ", regla[2])
-                        print()
-                    elif (regla[3] == 'C'):
-                        print('-> ',regla[1])
-                        print("Revisar expresión ingresada: ", regla[2])
-                        print()
-                    elif (regla[3] == 'D'):
-                        print('-> ',regla[1])
-                        print("Revisar expresión ingresada en la posición: ",",".join(str(x) for x in regla[2]))
-                        print()
-            SystemExit()
-        else:
-            cons = Construction(word)
-            nfa = cons.Thompson_Construction()
-            print(nfa)
-            showGraph(nfa)
-            print()
-        
+print("-----  AFD (Directo)  -----")
+T = directConstruction(word, postfixExp, alphabet)
+dfaD = T.buildDFA()
+print(dfaD)
+print()
+dfaD.alphabet = alphabet
+showGraphDFA(dfaD, "Directo")
+
+#print("-----  AFD (Directo_V2)  -----")
+T = directConstruction(wordVerify, postfixExpV2, alphabetV2)
+dfaD_V2 = T.buildDFA()
+dfaD_V2.alphabet = alphabet
+showGraphDFA(dfaD_V2, "Directo_V2")
+
+with open(f'./scanners_dfa/AFD_yal{nameFile[-1]}', 'wb') as f:
+    pickle.dump(dfaD, f)
+    pickle.dump(dfaD_V2, f)
+    pickle.dump(definitions, f)
+
+# --------------------------------------------------------------
+# Mostrar arboles: Laboratorio C
+# --------------------------------------------------------------
+# nameFile = "slr-4"
+# yal = YalLector(f'./yalex-tests/{nameFile}.yal')
+# word = yal.read()
+
+# Obj = Conversion(word)
+# postfixExp = Obj.infixToPostfix()
+# alphabet = Obj.get_alphabet()
+# print("Alfabeto: ", alphabet)
+
+# newSim = Simbolo('#') 
+# newSim2 = Simbolo('.') 
+# newSim2.setType(True)
+# NPos = postfixExp.copy()
+# NPos.append(newSim)
+# NPos.append(newSim2)
+
+# print()
+# ls = [l.label if not l.isSpecialChar else repr(l.label) for l in NPos]
+# print("Postfix: ", "".join(ls))
+# print()
+
+# T = Tree(NPos)
+# T.generateTree()       
+# T.print_final_Tree(f"tree_yal{nameFile[-1]}")
+
+print()

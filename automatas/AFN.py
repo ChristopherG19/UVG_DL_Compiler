@@ -4,32 +4,13 @@
 # Diseño de lenguajes
 # Christopher García 20541
 
-# Clase Stack
+# Se importan calses
 from tools.stack import Stack
 from tools.infixToPostfix import Conversion
+from tools.components import *
 
-class Estado():
-    def __init__(self, stateNum):
-        self.stateNum = stateNum
-        
-    def __str__(self):
-        return f"q{self.stateNum}"
-    
-    def __repr__(self):
-        return str(self)
-        
-class Transition():
-    def __init__(self, inState, symbol, fnState):
-        self.inState = inState
-        self.symbol = symbol
-        self.fnState = fnState
-        
-    def __str__(self):
-        return f"{self.inState}-{self.symbol}-{self.fnState}"
-    
-    def __repr__(self):
-        return str(self)
-class AFN:
+# Clase AFN: Representa los AFN's creados
+class AFN():
     def __init__(self, InState, FnState, numStates, transitions, states):
         self.epsilon = "ε"
         self.numStates = numStates
@@ -41,9 +22,10 @@ class AFN:
     
     def __str__(self):
         return f"No. Estados: {self.numStates}\nEstados: {self.states}\nEstado inicial: {self.initialState}\nEstado final: {self.finalState}\nTransiciones: {self.transitions}"
-        
+
+# Clase Construction: Representa la construcción de Thompson    
 class Construction(object):
-    def __init__(self, expression):
+    def __init__(self, expression, postfix, alphabet):
         self.expression = expression
         self.epsilon = "ε"
         self.numStates = 0
@@ -53,11 +35,10 @@ class Construction(object):
         
         self.AFNS = []
         
-        #Se obtiene la expresión en postfix
-        self.Obj = Conversion(self.expression)
-        self.postfixExp = self.Obj.infixToPostfix()
-        self.alphabet = self.Obj.get_alphabet(expression)
+        self.postfixExp = postfix
+        self.alphabet = alphabet
        
+    # Método para tener un mismo formato en las transiciones
     def fusionTransitions(self, transitions):
         result = []
         for element in transitions:
@@ -68,17 +49,15 @@ class Construction(object):
 
         return result 
     
+    # Algoritmo principal que lee la expresión y construye el AFN que se retorna
     def Thompson_Construction(self):
-        
-        print("Infix: ", self.expression)
-        print("Postfix: ",self.postfixExp)
-        
         for i in self.postfixExp:
-            self.Thompson_Components(i)
+            self.Thompson_Components(i.label)
             
         self.AFNS[0].numStates = len(self.AFNS[0].states)
         return self.AFNS[0]
-        
+    
+    # Algoritmo secundario que construye AFN's que componen al AFN final   
     def Thompson_Components(self, char):
         if (char in self.alphabet):
             self.AFNS.append(self.symbol(char))
@@ -105,6 +84,7 @@ class Construction(object):
             afn = self.AFNS.pop()
             self.AFNS.append(self.questionMark(afn))
 
+    # Construcción de un AFN para los símbolos
     def symbol(self, symbol):
         
         self.numStates += 1
@@ -120,7 +100,8 @@ class Construction(object):
         self.states.add(FnState)
         
         return AFN(InState, FnState, self.numStates, trans, [InState, FnState])
-        
+      
+    # Construcción de un AFN para las uniones  
     def union(self, afnA, afnB):
         self.numStates += 1
         InState = Estado(self.numStates)
@@ -145,6 +126,7 @@ class Construction(object):
          
         return AFN(InState, FnState, self.numStates, trans, states)
     
+    # Construcción de un AFN para las cerraduras kleene
     def kleene(self, afn):
         self.numStates += 1
         InState = Estado(self.numStates)
@@ -169,6 +151,7 @@ class Construction(object):
 
         return AFN(InState, FnState, self.numStates, trans, states)
     
+    # Construcción de un AFN para las cerraduras positivas
     def kleenePos(self, afn):
         self.numStates += 1
         InState = Estado(self.numStates)
@@ -191,7 +174,8 @@ class Construction(object):
             self.states.add(state)
 
         return AFN(InState, FnState, self.numStates, trans, states)
-        
+    
+    # Construcción de un AFN para las cerraduras interrogación    
     def questionMark(self, afn):
         self.numStates += 1
         InState = Estado(self.numStates)
@@ -218,8 +202,13 @@ class Construction(object):
         
         return AFN(InState, FnState, self.numStates, trans, states)
     
+    # Construcción de un AFN para las concatenaciones
     def concat(self, afnA, afnB):
         
+        '''
+            Se ajustan los estados para no tener que utilizar
+            concatenaciones con epsilon
+        '''
         for trans in afnB.transitions:
             if (trans.inState == afnB.initialState):
                 trans.inState = afnA.finalState

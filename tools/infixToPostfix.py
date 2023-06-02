@@ -6,6 +6,7 @@
 
 # Clase Stack
 from tools.stack import Stack
+from tools.components import *
 
 """
     Clase Conversion
@@ -22,62 +23,88 @@ class Conversion(object):
         self.HighestPrecedence = 5
 
     def infixToPostfix(self):
-        infixNew = ""
-        postfixExp = ""
+        
+        newInfix = []
+        if(type(self.infix) == str):
+            for i in self.infix:
+                newSym = Simbolo(i)
+                if i in self.operators or i in '()':
+                    newSym.setType(True)
+                newInfix.append(newSym)
+            self.infix = newInfix
+        
+        infixNew = []
+        postfixExp = []
         stack = Stack()
         CantElements = len(self.infix)
 
         # Se añade la concatenación explícita
         for index in range(CantElements):
             element = self.infix[index]
-            infixNew += element 
-            try:
-                if (element in '|(.'):
-                    continue
-                elif (((element in ')*+?') or (element not in '?+()*.|')) and (self.infix[index + 1] not in '+*?|)')):
-                    infixNew += '.'
-            except:
-                pass
+            infixNew.append(element) 
+            if ((index+1) < len(self.infix)):
+                if (element.isOperator):
+                    if(element.label in '*+?)'):
+                        if(not self.infix[index + 1].isOperator or self.infix[index + 1].label == '('):
+                            dotSym = Simbolo('.')
+                            dotSym.setType(True)
+                            infixNew.append(dotSym) 
+                elif (not element.isOperator):
+                    if(not self.infix[index + 1].isOperator):
+                        dotSym = Simbolo('.')
+                        dotSym.setType(True)
+                        infixNew.append(dotSym) 
+                    elif(self.infix[index + 1].label == '('):
+                        dotSym = Simbolo('.')
+                        dotSym.setType(True)
+                        infixNew.append(dotSym) 
+                    elif(self.infix[index + 1].label == 'ε'):
+                        dotSym = Simbolo('.')
+                        dotSym.setType(True)
+                        infixNew.append(dotSym) 
+        
+        print()
+        ls = [l.label if not l.isSpecialChar else repr(l.label) for l in infixNew]
+        print("Regex final infix Concatenaciones: ", "".join(ls))
+        print()
         
         # Se ordena la expresión dependiendo de la precedencia de operadores
         for element in infixNew:
-            if (element == '('):
+            #print(element, element.isOperator)
+            if (element.isOperator and element.label == '('):
                 stack.push(element)
                 
-            elif (element == ')'):
-                while (not stack.isEmpty() and stack.peek() != '('):
-                    postfixExp += stack.pop()
+            elif (element.isOperator and element.label == ')'):
+                while (not stack.isEmpty() and stack.peek().label != '('):
+                    postfixExp.append(stack.pop())
                 stack.pop()
             
-            elif (element in self.operators):
+            elif (element.isOperator and element.label in self.operators):
                 while (not stack.isEmpty()):
                     el = stack.peek()
-                    precedenceActualEl = self.precedencia[element]
-                    precedenceLastEl = self.precedencia[el]
+                    precedenceActualEl = self.precedencia[element.label]
+                    precedenceLastEl = self.precedencia[el.label]
 
                     if (precedenceLastEl >= precedenceActualEl):
-                        postfixExp += stack.pop()
+                        postfixExp.append(stack.pop())
                     else:
                         break
                     
                 stack.push(element)    
                     
             else:
-                postfixExp += element       
+                postfixExp.append(element)     
                     
         while (not stack.isEmpty()):
-            postfixExp += stack.pop()
-                    
+            postfixExp.append(stack.pop())
+                           
         return postfixExp
     
-    def get_alphabet(self, expression):
+    def get_alphabet(self):
         # Obtención de alfabeto
         alphabet = []
-        for i in expression:
-            if(i not in '().*+|$?' and i not in alphabet):
-                alphabet.append(i)
+        for symbol in self.infix:
+            if(not symbol.isOperator and symbol.label not in alphabet):
+                alphabet.append(symbol.label)
                 
         return sorted(alphabet)
-
-# a = Conversion('a+(a?|b)*b')
-# print(a.infixToPostfix())
