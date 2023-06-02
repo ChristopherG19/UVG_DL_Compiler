@@ -683,7 +683,7 @@ class YalpLector():
         
         return f"Error sintáctico en estado {state} con {symbol}"
     
-numberFile = 7
+numberFile = 1
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', f'./tokens/tokens_text_yal{numberFile}',numberFile)
 result = a.read()
 print()
