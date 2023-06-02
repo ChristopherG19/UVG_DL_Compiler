@@ -12,7 +12,7 @@ from tools.showGraph import showGraphDFA
 from prettytable import PrettyTable
 
 class YalpLector():
-    def __init__(self, file, tokensYal, numberFile):
+    def __init__(self, file, tokensYal, tokensText, numberFile):
         self.file = file
         self.tokensYalp = []
         self.grammar = []
@@ -28,6 +28,9 @@ class YalpLector():
             pickle.load(f)
             self.tokensY = pickle.load(f)
             
+        with open(tokensText, 'rb') as f:
+            self.tokensText = pickle.load(f)
+
     def read(self):
         with open(self.file, 'r', encoding="utf-8") as file:
             lines = file.readlines()
@@ -453,7 +456,7 @@ class YalpLector():
         
         dicProds = {}
         for el in range(1,len(self.prods)+1):
-            dicProds[el] = self.prods[el-1]            
+            dicProds[el] = self.prods[el-1]      
             
         for nState, states in statesR.items():
             for state in states:
@@ -464,11 +467,12 @@ class YalpLector():
                         for x,y in dicProds.items():
                             if (y.ls.label == prodVeri.ls.label):
                                 for m, n in zip(y.rs, prodVeri.rs):
-                                    if m.label == n.label:
-                                        # print(nState, state, x)
-                                        followL = self.follow(state.ls.label)
-                                        actions_reduce.append((nState, followL, 'r'+str(x)))
-                                        break
+                                    if(len(y.rs) == len(prodVeri.rs)):
+                                        if m.label == n.label:
+                                            # print(nState, state, x)
+                                            followL = self.follow(state.ls.label)
+                                            actions_reduce.append((nState, followL, 'r'+str(x)))
+                                            break
         
         return (actions_shift, actions_reduce)
         
@@ -563,6 +567,6 @@ class YalpLector():
         self.tokensVeri = list(set(alltokens) - notDefined)
         return linesWithoutTokens
 
-numberFile = 6
-a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', numberFile)
+numberFile = 1
+a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', f'./tokens/tokens_text_yal{numberFile}',numberFile)
 a.read()

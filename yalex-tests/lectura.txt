@@ -1,20 +1,5 @@
-10 1AAZ1 abc2a
-
-abcabacababcaba + 3.2E+15
-
-*) () 5%$
-
-ccc5a mundo )
-Frase prue_ba    ;
-
-ifes
-
-
-
-ife if
-
- / <<<;
-
-PALABRA22B
-
-22
+var1 + var2 * (var1 * var2)
+(id1 + id4) * id3
+(id2 * (id1 + id5))
+var1 + (var2 + (var3 + (var4 * var1)) * var2) + (var3 + var4 * (var1 * var2)) * var3
+bigIdentifierInCamelCase

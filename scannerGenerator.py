@@ -73,6 +73,7 @@ class ScannerGen():
                         return self.dicTokens[key]
         
     def print_listTokens(self, listTokens):
+        resultTokens = []
         for token in listTokens:
             if(token[1] == 'Error'):
                 print(f"-> Valor: {token[0]} | Token: Error léxico")
@@ -83,6 +84,9 @@ class ScannerGen():
                 else:
                     temp = token[0]
                 print(f"-> Valor: {temp} | Token: {self.get_token(temp, token[1][0])}")
+                resultTokens.append((temp, self.get_token(temp, token[1][0])))
+        
+        return resultTokens
         
     def get_new_list_tokens(self, listTokens):
         self.newListTokens = []
@@ -153,15 +157,18 @@ class ScannerGen():
             f.write("\t\tprint(f'-> Valor: {temp} | Token: {tokens_returns(token[1])}')\n")
             f.write("\n\n")
             
-name = 'yal2'     
+name = 'yal1'     
 Scan = ScannerGen(f'scanners_dfa/AFD_{name}', './yalex-tests/lectura.txt')
 listToks = Scan.simulate()
 print("Lectura de archivo y obtención de tokens\n")
-Scan.print_listTokens(listToks)
+tokensText = Scan.print_listTokens(listToks)
 
 tokenList = Scan.get_new_list_tokens(listToks)
 with open(f'tokens/tokens_{name}', 'wb') as f:
     pickle.dump(tokenList, f)
+    
+with open(f'tokens/tokens_text_{name}', 'wb') as f:
+    pickle.dump(tokensText, f)
     
 print()
 Scan.build_scanner(name)
