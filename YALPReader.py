@@ -186,21 +186,7 @@ class YalpLector():
         for x in self.ProductionsFinal:
             print(x)
         print()
-        
-        # print("\n------ First y Follow ------")
-        # resultFirst = self.first('expression')
-        # resultFirstB = self.first('term')
-        # resultFirstC = self.first('factor')
-        # resultFirstD = self.first('PLUS')
-        # resultFirstE = self.follow('term')
-        # print("First expression:",resultFirst)
-        # print("First term:",resultFirstB)
-        # print("First factor:",resultFirstC)
-        # print("First PLUS:",resultFirstD)
-        # print("Follow term:",resultFirstE)
-        # print()
-                        
-        print()
+
         return self.get_Final_States(newProdAumentada)
         
     def get_gramatical_symbols(self):
@@ -274,23 +260,27 @@ class YalpLector():
         return firstSet
         
             
-    def follow(self, symbol):
+    def follow(self, symbol, visited=None):
+        if visited is None:
+            visited = set()
+
         followSet = []
 
-        if(symbol == self.simboloInicial.label):
+        if symbol == self.simboloInicial.label:
             followSet.append('$')
-        
+
         for prod in self.ProductionsFinal:
             for i in range(len(prod.rs)):
-                if(symbol == prod.rs[i].label):
-                    if(prod.rs[i].label == prod.rs[-1].label):
-                        if(symbol != prod.ls.label):
-                            fol = self.follow(prod.ls.label)
+                if symbol == prod.rs[i].label:
+                    if prod.rs[i].label == prod.rs[-1].label:
+                        if symbol != prod.ls.label and prod.ls.label not in visited:
+                            visited.add(prod.ls.label)
+                            fol = self.follow(prod.ls.label, visited)
                             for el in fol:
                                 if el not in followSet:
                                     followSet.append(el)
-                    if ((i+1) < len(prod.rs)):
-                        firs = self.first(prod.rs[i+1].label)
+                    if (i + 1) < len(prod.rs):
+                        firs = self.first(prod.rs[i + 1].label)
                         for el in firs:
                             if el not in followSet:
                                 followSet.append(el)
@@ -398,6 +388,18 @@ class YalpLector():
         
         finalColumnA = {}
         for x,y in columnsActions.items():
+
+            check = {}
+            for el in y:
+                if el[0] not in check:
+                    check[el[0]] = [el[1]]
+                else:
+                    check[el[0]].append(el[1])
+                    
+            for a, b in check.items():
+                if len(b) > 1 and len(set(b)) > 1: 
+                    return (a,b) 
+            
             newColumn = ['' for x in range(len(finalStates.keys()))]
             for i in y:
                 newColumn[int(i[0][1:])] = i[1]
@@ -436,6 +438,9 @@ class YalpLector():
         prettyT.align = "c"
         prettyT.title = "Tabla de parseo SLR(1)"
         print(prettyT)
+        
+        with open(f'./tables/tabla_parseo_slr{self.numberFile}.txt', 'w', encoding="utf-8") as f:
+            f.write(prettyT.get_string())
         
         return self.simulate(list(finalStates.keys()), actions, gotos, FnState)
             
@@ -654,8 +659,11 @@ class YalpLector():
             prettyT.add_column("Actions", Actions)
 
             prettyT.align = "c"
-            prettyT.title = "Tabla de parseo SLR(1) Simulación"
+            prettyT.title = "Tabla de parseo SLR(1) Simulación "
             print(prettyT)
+            
+            with open(f'./tables/tabla_parseo_sim_slr{self.numberFile}.txt', 'w', encoding="utf-8") as f:
+                f.write(prettyT.get_string())
 
         return result
     
@@ -675,11 +683,14 @@ class YalpLector():
         
         return f"Error sintáctico en estado {state} con {symbol}"
     
-numberFile = 1
+numberFile = 7
 a = YalpLector(f'./yalp-tests/slr-{numberFile}.yalp', f'./scanners_dfa/AFD_yal{numberFile}', f'./tokens/tokens_text_yal{numberFile}',numberFile)
 result = a.read()
 print()
 print("-"*50)
-print("Lectura final del archivo, es aceptado:", result)
+if type(result) == tuple:
+    print(f"Lectura final del archivo, es aceptado: No\nConflicto en {result[0]} por estas acciones {','.join(result[1])}")
+else:
+    print("Lectura final del archivo, es aceptado:", result)
 print("-"*50)
 print()
